@@ -1,0 +1,6 @@
+
+class HorizontalAxis(SinglePosition):
+    pass
+
+
+
