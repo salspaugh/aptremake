@@ -1,5 +1,5 @@
 
-from data import FunctionalDependency, Set, Type
+from data import CartesianProduct, FunctionalDependency, Set, Type
 
 class Encoding(object):
 
@@ -12,24 +12,27 @@ class SinglePosition(Encoding):
     @classmethod
     def can_encode(self, partition):
         if (isinstance(partition, FunctionalDependency) \
-            and partition.domain.type == Type.nominal):
-                return True
+                and partition.domain.type == Type.nominal):
+            return True
         return False
 
 class ApposedPosition(Encoding):
     
     @classmethod
     def can_encode(self, partition):
-        return False
+        if (isinstance(partition, CartesianProduct) \
+                and not partition.sets[0].type == Type.nominal \
+                and not partition.sets[1].type == Type.nominal):
+            return True
 
 class RetinalList(Encoding):
     
     @classmethod
     def can_encode(self, partition):
         if (isinstance(partition, Set) \
-                and not partition.type == Type.quantitative) \
-            or (isinstance(partition, FunctionalDependency) \
-                and not partition.domain.type == Type.quantitative):
+                    and not partition.type == Type.quantitative) \
+                or (isinstance(partition, FunctionalDependency) \
+                    and not partition.domain.type == Type.quantitative):
             return True
         return False
 
@@ -38,7 +41,7 @@ class Map(Encoding):
     @classmethod
     def can_encode(self, partition):
         if (isinstance(partition, FunctionalDependency) \
-            and partition.domain.type == Type.location):
+                and partition.domain.type == Type.location):
             return True
         return False
 

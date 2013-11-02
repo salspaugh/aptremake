@@ -1,5 +1,6 @@
 
-from encoding import encodings
+from languages import _languages
+from ranking import rank
 
 INDENT = '    '
 
@@ -85,10 +86,10 @@ class PartitionTreeNode(PlanTreeNode):
 
     def get_designs(self, partition):
         designs = []
-        for encoding in encodings:
-            if encoding.can_encode(partition):
-                designs.append(encoding())
-        return designs
+        for language in _languages:
+            if language.can_express(partition):
+                designs.append(language())
+        return rank(partition, designs)
 
     def generate_children(self):
         designs = []
@@ -120,6 +121,12 @@ class CompositionTreeNode(PlanTreeNode):
 
     def __init__(self):
         PlanTreeNode.__init__(self)
+
+    def generate_children(self):
+        pass
+
+    def __repr__(self):
+        return " ".join(["COMPOSITION:"])
 
 class PresentationTreeNode(PlanTreeNode):
 

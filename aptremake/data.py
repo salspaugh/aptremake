@@ -37,3 +37,6 @@ class CartesianProduct(Relation):
     def __init__(self, name=""):
         self.sets = None
         Relation.__init__(self, name=name)
+
+    def __repr__(self):
+        return " ".join(["CartesianProduct:", self.name, "(sets:", str(self.sets) + ")"])
