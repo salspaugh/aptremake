@@ -17,6 +17,14 @@ class PlanTreeNode(object):
     def add_children(self, children):
         for child in children:
             self.add_child(child)
+    
+    def flatten(self, container):
+        for i in container:
+            if isinstance(i, list) or isinstance(i, tuple):
+                for j in self.flatten(i):
+                    yield j
+            else:
+                yield i
 
     def _str_tree(self, recursive=True, indent=1):
         to_str = str(self)
@@ -63,14 +71,6 @@ class PartitionTreeNode(PlanTreeNode):
         self.partition = partition
         PlanTreeNode.__init__(self) 
 
-    def flatten(self, container):
-        for i in container:
-            if isinstance(i, list) or isinstance(i, tuple):
-                for j in self.flatten(i):
-                    yield j
-            else:
-                yield i
-
     def combine(self, sets):
         if len(sets) == 0:
             return sets
@@ -88,14 +88,13 @@ class PartitionTreeNode(PlanTreeNode):
         designs = []
         for language in _languages:
             if language.can_express(partition):
-                designs.append(language())
+                designs.append(language(partition))
         return rank(partition, designs)
 
     def generate_children(self):
         designs = []
         for part in self.partition:
             designs.append(self.get_designs(part))
-        print designs
         for selections in self.combine(designs):
             selections = list(self.flatten(selections))
             s = SelectionTreeNode()
@@ -110,16 +109,27 @@ class SelectionTreeNode(PlanTreeNode):
     def __init__(self):
         self.selections = None
         PlanTreeNode.__init__(self)
-
+    
+    def compose(self):
+        s = Sentence()
+        for selection in self.selections:
+            if not s.compose(selection):
+                return None
+        return s
+    
     def generate_children(self):
-        pass
+        design = self.compose(self.selections)
+        if design:
+            c = CompositionTreeNode(design)
+            self.add_child(c)
 
     def __repr__(self):
         return " ".join(["SELECTION:"] + [str(s) for s in self.selections])
 
 class CompositionTreeNode(PlanTreeNode):
 
-    def __init__(self):
+    def __init__(self, design):
+        self.design = design
         PlanTreeNode.__init__(self)
 
     def generate_children(self):

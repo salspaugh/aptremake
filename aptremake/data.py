@@ -17,6 +17,7 @@ class Set(Relation):
     def __init__(self, name=""):
         self.data = None
         self.type = None
+        self.domain = None
         Relation.__init__(self, name=name)
 
     def __repr__(self):
@@ -35,7 +36,8 @@ class FunctionalDependency(Relation):
 class CartesianProduct(Relation):
     
     def __init__(self, name=""):
-        self.sets = None
+        self.independent = None
+        self.dependent = None
         Relation.__init__(self, name=name)
 
     def __repr__(self):
