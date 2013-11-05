@@ -5,7 +5,7 @@ class HorizontalAxis(object):
     def __init__(self, data):
         self.data = data
 
-    def compose(self, more):
+    def compose(self, other):
         pass
 
 class VerticalAxis(object):
@@ -19,36 +19,88 @@ class Marks(object):
         self.hpos = None
         self.vpos = None
         self.color = None
-        self.shape = None
-        self.size = None
-        self.texture = None
-        self.orientation = None
-        self.saturation = None
+        #self.shape = None
+        #self.size = None
+        #self.texture = None
+        #self.orientation = None
+        #self.saturation = None
+
+    def nothing_assigned(self):
+        return not (self.hpos and self.vpos and self.color)
+
+    def assign_all(self, other):
+        try:
+            self.hpos = [other.hpos]
+        except: # TODO: Catch the correct error here.
+            pass
+        try:
+            self.vpos = [other.vpos]
+        except:
+            pass
+        try:
+            self.color = [other.color]
+        except:
+            pass
+        return True
 
     def compose(self, other):
-        if (other.hpos and self.hpos) or \
-            (other.vpos and self.vpos) or \
-            (other.color and self.color) or \
-            (other.shape and self.shape) or \
-            (other.size and self.size) or \
-            (other.texture and self.texture) or \
-            (other.orientation and self.orientation) or \
-            (other.saturation and self.saturation):
+        if self.nothing_assigned():
+            return self.assign_all(other)
+
+        if self.hpos and not self.vpos and not self.color:
+            if other.hpos and not other.vpos and not other.color:
+                return False
+            if not other.hpos and other.vpos and not other.color:
+                return False
+            if not other.hpos and not other.vpos and other.color:
+                return False
+            if other.hpos and other.vpos and not other.color:
+                return False
+            if other.hpos and not other.vpos and other.color:
+                return False
+            if not other.hpos and other.vpos and other.color:
+                return False
+            if other.hpos and other.vpos and other.color:
+                return False
+
+        if not self.hpos and self.vpos and not self.color:
+            if other.hpos and not other.vpos and not other.color:
+                return False
+            if not other.hpos and other.vpos and not other.color:
+                return False
+            if not other.hpos and not other.vpos and other.color:
+                return False
+            if other.hpos and other.vpos and not other.color:
+                return False
+            if other.hpos and not other.vpos and other.color:
+                return False
+            if not other.hpos and other.vpos and other.color:
+                return False
+            if other.hpos and other.vpos and other.color:
+                return False
+
+        if not self.hpos and not self.vpos and self.color:
+            if other.hpos and not other.vpos and not other.color:
+                return False
+            if not other.hpos and other.vpos and not other.color:
+                return False
+            if not other.hpos and not other.vpos and other.color:
+                return False
+            if other.hpos and other.vpos and not other.color:
+                return False
+            if other.hpos and not other.vpos and other.color:
+                return False
+            if not other.hpos and other.vpos and other.color:
+                return False
+            if other.hpos and other.vpos and other.color:
+                return False
+     
+        if self.hpos and self.vpos and not self.color:
             return False
-        if other.hpos and not self.hpos:
-            self.hpos = other.hpos
-        if other.vpos and not self.vpos:
-            self.vpos = other.vpos
-        if other.color and not self.color:
-            self.color = other.color
-        if other.shape and not self.shape:
-            self.shape = other.shape
-        if other.size and not self.size:
-            self.size = other.size
-        if other.texture and not self.texture:
-            self.texture = other.texture
-        if other.orientation and not self.orientation:
-            self.orientation = other.orientation
-        if other.saturation and not self.saturation:
-            self.saturation = other.saturation
-        return True
+        if self.hpos and not self.vpos and self.color:
+            return False
+        if not self.hpos and self.vpos and self.color:
+            return False
+
+        if self.hpos and self.vpos and self.color:
+            return False

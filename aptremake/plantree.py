@@ -88,7 +88,7 @@ class PartitionTreeNode(PlanTreeNode):
         designs = []
         for language in _languages:
             if language.can_express(partition):
-                designs.append(language(partition))
+                designs.append(language.design(partition))
         return rank(partition, designs)
 
     def generate_children(self):
@@ -111,12 +111,8 @@ class SelectionTreeNode(PlanTreeNode):
         PlanTreeNode.__init__(self)
     
     def compose(self):
-        s = Sentence()
-        for selection in self.selections:
-            if not s.compose(selection):
-                return None
-        return s
-    
+        pass
+
     def generate_children(self):
         design = self.compose(self.selections)
         if design:

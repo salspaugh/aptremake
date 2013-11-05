@@ -28,6 +28,7 @@ class FunctionalDependency(Relation):
     def __init__(self, name=""):
         self.domain = None
         self.range = None
+        self.tuples = None
         Relation.__init__(self, name=name)
 
     def __repr__(self):
@@ -38,6 +39,7 @@ class CartesianProduct(Relation):
     def __init__(self, name=""):
         self.independent = None
         self.dependent = None
+        self.tuples = None
         Relation.__init__(self, name=name)
 
     def __repr__(self):

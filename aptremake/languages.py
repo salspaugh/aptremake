@@ -4,6 +4,15 @@ import render
 from encoding import SinglePosition, ApposedPosition, RetinalList, Map, Connection, Miscellaneous
 from data import *
 
+class Objects(object):
+    
+    haxis = "HAXIS"
+    vaxis = "VAXIS"
+    hpos = "HPOS"
+    vpos = "VPOS"
+    color = "COLOR"
+    
+
 class Task(object):
     
     position = "POSITION"
@@ -23,16 +32,18 @@ class Task(object):
 
 class HorizontalAxis(SinglePosition):
 
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.position
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.hpos = data.domain
-        self.haxis = render.HorizontalAxis(data.range)
 
     @classmethod
     def can_express(self, relation):
         return SinglePosition.can_encode(relation)
+
+    @classmethod
+    def design(self, relation):
+        marks = Encodes(Objects.hpos, relation, self)
+        axis = Encodes(Objects.haxis, relation.range.domain, self)
+        return Design([marks, axis])
 
     def __repr__(self):
         return "".join(["HorizontalAxis<", str(self.data), ">"])
@@ -40,79 +51,66 @@ class HorizontalAxis(SinglePosition):
 
 class VerticalAxis(SinglePosition):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.position
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.vpos = data.domain
-        self.vaxis = render.HorizontalAxis(data.range)
     
     @classmethod
     def can_express(self, relation):
         return SinglePosition.can_encode(relation)
 
+    @classmethod
+    def design(self, relation):
+        marks = Encodes(Objects.vpos, relation, self)
+        axis = Encodes(Objects.vaxis, relation.range.domain, self)
+        return Design([marks, axis])
+
     def __repr__(self):
         return "".join(["VerticalAxis<", str(self.data), ">"])
 
 
-class LineChart(ApposedPosition):
-    
-    def __init__(self, data):
-        self.task = Task.slope
-        self.data = data
-        self.haxis = render.HorizontalAxis(data.independent)
-        self.vaxis = render.VerticalAxis(data.dependent)
-
-    @classmethod
-    def can_express(self, relation):
-        return ApposedPosition.can_encode(relation)
-
-    def __repr__(self):
-        return "".join(["LineChart<", str(self.data), ">"])
-
-
-class BarChart(ApposedPosition):
-    
-    def __init__(self, data):
-        self.task = Task.length
-        self.data = data
-        # FIXME: What are the marks in these cases?
-        self.haxis = render.HorizontalAxis(data.independent)
-        self.vaxis = render.VerticalAxis(data.dependent)
-    
-    @classmethod
-    def can_express(self, relation):
-        return ApposedPosition.can_encode(relation)
-
-    def __repr__(self):
-        return "".join(["BarChart<", str(self.data), ">"])
-
-
-class PlotChart(ApposedPosition):
-
-    def __init__(self, data):
-        self.task = Task.position
-        self.data = data
-        self.haxis = render.HorizontalAxis(data.independent)
-        self.vaxis = render.VerticalAxis(data.dependent)
-    
-    @classmethod
-    def can_express(self, relation):
-        return ApposedPosition.can_encode(relation)
-
-    def __repr__(self):
-        return "".join(["PlotChart<", str(self.data), ">"])
+#class LineChart(ApposedPosition):
+#    
+#    def __init__(self):
+#        self.task = Task.slope
+#
+#    @classmethod
+#    def can_express(self, relation):
+#        return ApposedPosition.can_encode(relation)
+#
+#    def __repr__(self):
+#        return "".join(["LineChart<", str(self.data), ">"])
+#
+#
+#class BarChart(ApposedPosition):
+#    
+#    def __init__(self):
+#        self.task = Task.length
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        return ApposedPosition.can_encode(relation)
+#
+#    def __repr__(self):
+#        return "".join(["BarChart<", str(self.data), ">"])
+#
+#
+#class PlotChart(ApposedPosition):
+#
+#    def __init__(self):
+#        self.task = Task.position
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        return ApposedPosition.can_encode(relation)
+#
+#    def __repr__(self):
+#        return "".join(["PlotChart<", str(self.data), ">"])
 
 
 class Color(RetinalList):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.hue
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.color = data
-        if isinstance(self.data, FunctionalDependency):
-            self.marks.color = data.range
 
     @classmethod
     def can_express(self, relation):
@@ -124,141 +122,120 @@ class Color(RetinalList):
                 and relation.type == Type.nominal):
                 return True
         return False
+    
+    @classmethod
+    def design(self, relation):
+        marks = Encodes(Objects.color, relation, self)
+        return Design([marks])
 
     def __repr__(self):
         return "".join(["Color<", str(self.data), ">"])
 
 
-class Shape(RetinalList):
-    
-    def __init__(self, data):
-        self.task = Task.shape
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.shape = data
-        if isinstance(self.data, FunctionalDependency):
-            self.marks.shape = data.range
-    
-    @classmethod
-    def can_express(self, relation):
-        if RetinalList.can_encode(relation):
-            if (isinstance(relation, FunctionalDependency) \
-                and relation.range.type == Type.nominal) \
-                or \
-                (isinstance(relation, Set) \
-                and relation.type == Type.nominal):
-                return True
-        return False
-
-    def __repr__(self):
-        return "".join(["Shape<", str(self.data), ">"])
-
-
-class Size(RetinalList):
-    
-    def __init__(self, data):
-        self.task = Task.area
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.size = data
-        if isinstance(self.data, FunctionalDependency):
-            self.marks.size = data.range
-    
-    @classmethod
-    def can_express(self, relation):
-        if RetinalList.can_encode(relation):
-            if (isinstance(relation, FunctionalDependency) \
-                and not relation.range.type == Type.nominal) \
-                or \
-                (isinstance(relation, Set) \
-                and not relation.type == Type.nominal):
-                return True
-        return False
-
-    def __repr__(self):
-        return "".join(["Size<", str(self.data), ">"])
-
-
-class Saturation(RetinalList):
-    
-    def __init__(self, data):
-        self.task = Task.saturation
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.saturation = data
-        if isinstance(self.data, FunctionalDependency):
-            self.marks.saturation = data.range
-    
-    @classmethod
-    def can_express(self, relation):
-        if RetinalList.can_encode(relation):
-            if (isinstance(relation, FunctionalDependency) \
-                and not relation.range.type == Type.nominal) \
-                or \
-                (isinstance(relation, Set) \
-                and not relation.type == Type.nominal):
-                return True
-        return False
-
-    def __repr__(self):
-        return "".join(["Saturation<", str(self.data), ">"])
-
-
-class Texture(RetinalList):
-    
-    def __init__(self, data):
-        self.task = Task.texture
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.texture = data
-        if isinstance(self.data, FunctionalDependency):
-            self.marks.texture = data.range
-    
-    @classmethod
-    def can_express(self, relation):
-        if RetinalList.can_encode(relation):
-            if (isinstance(relation, FunctionalDependency) \
-                and not relation.range.type == Type.quantitative) \
-                or \
-                (isinstance(relation, Set) \
-                and not relation.type == Type.quantitative):
-                return True
-        return False
-
-    def __repr__(self):
-        return "".join(["Texture<", str(self.data), ">"])
-
-
-class Orientation(RetinalList):
-    
-    def __init__(self, data):
-        self.task = Task.angle
-        self.data = data
-        self.marks = render.Marks()
-        self.marks.orientation = data
-        if isinstance(self.data, FunctionalDependency):
-            self.marks.orientation = data.range
-    
-    @classmethod
-    def can_express(self, relation):
-        if RetinalList.can_encode(relation):
-            if (isinstance(relation, FunctionalDependency) \
-                and relation.range.type == Type.nominal) \
-                or \
-                (isinstance(relation, Set) \
-                and relation.type == Type.nominal):
-                return True
-        return False
-
-    def __repr__(self):
-        return "".join(["Orientation<", str(self.data), ">"])
-
-
+#class Shape(RetinalList):
+#    
+#    def __init__(self):
+#        self.task = Task.shape
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        if RetinalList.can_encode(relation):
+#            if (isinstance(relation, FunctionalDependency) \
+#                and relation.range.type == Type.nominal) \
+#                or \
+#                (isinstance(relation, Set) \
+#                and relation.type == Type.nominal):
+#                return True
+#        return False
+#
+#    def __repr__(self):
+#        return "".join(["Shape<", str(self.data), ">"])
+#
+#
+#class Size(RetinalList):
+#    
+#    def __init__(self):
+#        self.task = Task.area
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        if RetinalList.can_encode(relation):
+#            if (isinstance(relation, FunctionalDependency) \
+#                and not relation.range.type == Type.nominal) \
+#                or \
+#                (isinstance(relation, Set) \
+#                and not relation.type == Type.nominal):
+#                return True
+#        return False
+#
+#    def __repr__(self):
+#        return "".join(["Size<", str(self.data), ">"])
+#
+#
+#class Saturation(RetinalList):
+#    
+#    def __init__(self):
+#        self.task = Task.saturation
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        if RetinalList.can_encode(relation):
+#            if (isinstance(relation, FunctionalDependency) \
+#                and not relation.range.type == Type.nominal) \
+#                or \
+#                (isinstance(relation, Set) \
+#                and not relation.type == Type.nominal):
+#                return True
+#        return False
+#
+#    def __repr__(self):
+#        return "".join(["Saturation<", str(self.data), ">"])
+#
+#
+#class Texture(RetinalList):
+#    
+#    def __init__(self):
+#        self.task = Task.texture
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        if RetinalList.can_encode(relation):
+#            if (isinstance(relation, FunctionalDependency) \
+#                and not relation.range.type == Type.quantitative) \
+#                or \
+#                (isinstance(relation, Set) \
+#                and not relation.type == Type.quantitative):
+#                return True
+#        return False
+#
+#    def __repr__(self):
+#        return "".join(["Texture<", str(self.data), ">"])
+#
+#
+#class Orientation(RetinalList):
+#    
+#    def __init__(self):
+#        self.task = Task.angle
+#    
+#    @classmethod
+#    def can_express(self, relation):
+#        if RetinalList.can_encode(relation):
+#            if (isinstance(relation, FunctionalDependency) \
+#                and relation.range.type == Type.nominal) \
+#                or \
+#                (isinstance(relation, Set) \
+#                and relation.type == Type.nominal):
+#                return True
+#        return False
+#
+#    def __repr__(self):
+#        return "".join(["Orientation<", str(self.data), ">"])
+#
+#
 class RoadMap(Map):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.position
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
@@ -270,9 +247,8 @@ class RoadMap(Map):
 
 class TopographicMap(Map):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.density
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
@@ -284,9 +260,8 @@ class TopographicMap(Map):
 
 class Tree(Connection):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.connection
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
@@ -298,9 +273,8 @@ class Tree(Connection):
 
 class AcyclicGraph(Connection):
 
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.connection
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
@@ -312,9 +286,8 @@ class AcyclicGraph(Connection):
 
 class Network(Connection):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.connection
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
@@ -326,9 +299,8 @@ class Network(Connection):
 
 class PieChart(Miscellaneous):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.angle
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
@@ -340,9 +312,8 @@ class PieChart(Miscellaneous):
 
 class VennDiagram(Miscellaneous):
     
-    def __init__(self, data):
+    def __init__(self):
         self.task = Task.area
-        self.data = data
     
     @classmethod
     def can_express(self, relation):
