@@ -62,7 +62,7 @@ def rank(partition, designs):
     ranking_list = ranking_lists[type]
     ranks = {}
     for design in designs:
-        ranks[design] = ranking_list.index(design.task)
+        ranks[design] = ranking_list.index(design.language.task)
     ranks = sorted(ranks.items(), key=lambda x: x[1])
     return [r[0] for r in ranks]
     

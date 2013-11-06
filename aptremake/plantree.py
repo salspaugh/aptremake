@@ -1,6 +1,7 @@
 
 from languages import _languages
 from ranking import rank
+from composition import compose
 
 INDENT = '    '
 
@@ -110,11 +111,8 @@ class SelectionTreeNode(PlanTreeNode):
         self.selections = None
         PlanTreeNode.__init__(self)
     
-    def compose(self):
-        pass
-
     def generate_children(self):
-        design = self.compose(self.selections)
+        design = compose(self.selections)
         if design:
             c = CompositionTreeNode(design)
             self.add_child(c)
