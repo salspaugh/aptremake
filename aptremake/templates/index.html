@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block sidebar_content %}
+<p> Sidebar </p>
+{% endblock %}
+
+{% block body_content %}
+
+<svg id="presentation">
+    <script> render({{ design }}); </script>
+</svg>
+
+{% endblock %}

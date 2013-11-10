@@ -2,6 +2,7 @@
 from languages import _languages
 from ranking import rank
 from composition import compose
+from render import render
 
 INDENT = '    '
 
@@ -127,12 +128,15 @@ class CompositionTreeNode(PlanTreeNode):
         PlanTreeNode.__init__(self)
 
     def generate_children(self):
-        pass
+        presentation = render(self.design)
+        p = PresentationTreeNode(presentation)
+        self.add_child(p)
 
     def __repr__(self):
         return " ".join(["COMPOSITION:"])
 
 class PresentationTreeNode(PlanTreeNode):
 
-    def __init__(self):
+    def __init__(self, presentation):
+        self.presentation = presentation
         PlanTreeNode.__init__(self)

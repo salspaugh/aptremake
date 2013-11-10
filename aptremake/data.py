@@ -44,3 +44,6 @@ class CartesianProduct(Relation):
 
     def __repr__(self):
         return " ".join(["CartesianProduct:", self.name, "(sets:", str(self.sets) + ")"])
+
+def read_data(spec):
+    pass

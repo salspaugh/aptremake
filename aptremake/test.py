@@ -10,37 +10,37 @@ class TestBase(unittest.TestCase):
 
     def setUp(self):
         self.make_set = Set(name="Make")
-        self.make_set.data = ["Honda", "Audi", "Dodge", "Nissan"]
+        self.make_set.tuples = ["Honda", "Audi", "Dodge", "Nissan"]
         self.make_set.type = Type.nominal
         self.make_set.domain = "Make"
    
         self.type_set = Set()
-        self.type_set.data = ["suv", "sedan", "coupe"]
+        self.type_set.tuples = ["suv", "sedan", "coupe"]
         self.type_set.type = Type.nominal
         self.type_set.domain = "Type"
     
         self.price_set = Set()
-        self.price_set.data = [5000, 10000, 3000, 6000]
+        self.price_set.tuples = [5000, 10000, 3000, 6000]
         self.price_set.type = Type.quantitative
         self.price_set.domain = "Price"
 
         self.mileage_set = Set()
-        self.mileage_set.data = [48500, 32000, 60010, 20500]
+        self.mileage_set.tuples = [48500, 32000, 60010, 20500]
         self.mileage_set.type = Type.quantitative
         self.mileage_set.domain = "Mileage"
 
         self.weight_set = Set()
-        self.weight_set.data = [400, 600, 800, 500] 
+        self.weight_set.tuples = [400, 600, 800, 500] 
         self.weight_set.type = Type.quantitative
         self.weight_set.domain = "Weight"
         
         self.repair_set = Set()
-        self.repair_set.data = ["ok", "ok", "good", "bad"]
+        self.repair_set.tuples = ["ok", "ok", "good", "bad"]
         self.repair_set.type = Type.ordinal
         self.repair_set.domain = "Repair"
         
         self.nation_set = Set()
-        self.nation_set.data = ["Korea", "Germany", "US", "Japan"]
+        self.nation_set.tuples = ["Korea", "Germany", "US", "Japan"]
         self.nation_set.type = Type.nominal
         self.nation_set.domain = "Nation"
         

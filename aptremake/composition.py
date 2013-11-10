@@ -34,25 +34,38 @@ class Encodes(object):
     def __repr__(self):
         return "Encodes(%s, %s, %s)" % (self.objects, self.facts, self.language)
 
+def encode_marks_differently(design):
+    marks = filter(lambda x: x.encodes_marks(), design.encodings)
+    marks_facts_names = [mark.facts.name for mark in marks]
+    if len(set(marks_facts_names)) > 1:
+        if not design.color_assigned():
+            marks_facts_names_set = Set(name="+".join(list(set(marks_facts_names))))
+            marks_facts_names_set.data = set(marks_facts_names)
+            marks_facts_names_set.name = Type.nominal
+            marks_facts_names_set.domain = "Mark Names"
+            design.encodings.add(Color.design(relation_set))
+
 def double_axes_composition(design):
     haxes = filter(lambda x: x.encodes_haxis(), design.encodings)
     vaxes = filter(lambda x: x.encodes_vaxis(), design.encodings)
     if len(haxes) == 2 and len(vaxes) == 2 and \
-        haxes[0].facts.range == haxes[1].facts.range and \
-        vaxes[0].facts.range == vaxes[1].facts.range:
+        haxes[0].facts.domain == haxes[1].facts.domain and \
+        vaxes[0].facts.domain == vaxes[1].facts.domain:
         design.encodings.remove(haxes[1])
         design.encodings.remove(vaxes[1])
-        # TODO: Adjust marks to differentiate them 
+        encode_marks_differently(design)
 
 def single_axis_composition(design):
     haxes = filter(lambda x: x.encodes_haxis(), design.encodings)
     if len(haxes) == 2 and \
-        haxes[0].facts == haxes[1].facts:
+        haxes[0].facts.domain == haxes[1].facts.domain:
         design.encodings.remove(haxes[1])
+        encode_marks_differently(design)
     vaxes = filter(lambda x: x.encodes_vaxis(), design.encodings)
     if len(vaxes) == 2 and \
-        vaxes[0].facts == vaxes[1].facts:
+        vaxes[0].facts.domain == vaxes[1].facts.domain:
         design.encodings.remove(vaxes[1])
+        encode_marks_differently(design)
 
 def mark_composition(design):
     marks = filter(lambda x: x.encodes_marks(), design.encodings)
@@ -81,15 +94,29 @@ class Design(object):
     
     def __init__(self, encodings):
         self.encodings = encodings
-        self.language = encodings[0].language # FIXME
-
-    def contains_conflicting_encodings(self):
-        marks = filter(lambda x: x.encodes_marks(), self.encodings)
-        haxes = filter(lambda x: x.encodes_haxis(), self.encodings)
-        vaxes = filter(lambda x: x.encodes_vaxis(), self.encodings)
-        color = filter(lambda x: x.encodes_color(), self.encodings)
-        return len(marks) > 1 or len(haxes) > 1 or len(vaxes) > 1 or len(color) > 1
+        self.language = encodings[0].language # FIXME:
+        # What happens when encodings have a mix of languages.
 
     def __repr__(self):
         return "\n\t".join([str(e) for e in self.encodings])
 
+    def hpos(self):
+        for encoding in self.encodings:
+            if encoding.objects == Objects.hpos:
+                return encoding
+
+    def vpos(self):
+        for encoding in self.encodings:
+            if encoding.objects == Objects.vpos:
+                return encoding
+
+    def color(self):
+        for encoding in self.encodings:
+            if encoding.objects == Objects.color:
+                return encoding
+
+    def contains_conflicting_encodings(self):
+        haxes = filter(lambda x: x.encodes_haxis(), self.encodings)
+        vaxes = filter(lambda x: x.encodes_vaxis(), self.encodings)
+        color = filter(lambda x: x.encodes_color(), self.encodings)
+        return len(haxes) > 1 or len(vaxes) > 1 or len(color) > 1
