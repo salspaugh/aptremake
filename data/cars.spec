@@ -22,6 +22,36 @@
     {
         "name": "Car price for 1979",
         "type": "FunctionalDependency",
-        "data": [["Accord", 5900], ["AMC Pacer", 4250], ["Audi 5000", 10000], ["BMW 320i", 10100], ["Champ", 4000], ["Chev Nova", 3700], ["Civic", 4000], ["Datsun 210", 4100], ["Datsun 810", 8250], ["Deville", 11250], ["Le Car", 3650], ["Linc Cont", 11500], ["Horizon", 4000], ["Mustang", 3850], ["Peugot", 13000], ["Saab 900", 9000], ["Subaru", 3600], ["Volvo 260", 12000], ["VW Dasher", 7000]]
+        "data": [["Accord", 5799], ["AMC Pacer", 4749], ["Audi 5000", 9690], ["BMW 320i", 9735], ["Champ", 4425], ["Chev Nova", 3955], ["Civic", 4499], ["Datsun 210", 4589], ["Datsun 810", 8128], ["Deville", 11385], ["Le Car", 3895], ["Linc Cont", 11497], ["Horizon", 4482], ["Mustang", 4187], ["Peugot", 12990], ["Saab 900", 9348], ["Subaru", 3798], ["Volvo 260", 11995], ["VW Dasher", 7140]]
+    },
+    {
+        "name": "Repair",
+        "type": "Set",
+        "data": ["Terrible", "Bad", "OK", "Good", "Great"]
+    },
+    {
+        "name": "Repair record for 1979",
+        "type": "FunctionalDependency",
+        "data": [["Accord", "Great"], ["AMC Pacer", "Terrible"], ["Audi 5000", "Bad"], ["BMW 320i", "Good"], ["Champ", "Good"], ["Chev Nova", "OK"], ["Civic", "Good"], ["Datsun 210", "Great"], ["Datsun 810", "Good"], ["Deville", "OK"], ["Le Car", "OK"], ["Linc Cont", "Good"], ["Horizon", "OK"], ["Mustang", "OK"], ["Peugot", "OK"], ["Saab 900", "Bad"], ["Subaru", "Good"], ["Volvo 260",  "Terrible"], ["VW Dasher", "OK"]]
+    },
+    {
+        "name": "Mileage",
+        "type": "Set",
+        "data": [25, 17, 17, 25, 32, 18, 28, 35, 20, 13, 25, 12, 23, 20, 15, 20, 33, 17, 22]
+    },
+    {
+        "name": "Car mileage for 1979",
+        "type": "FunctionalDependency",
+        "data": [["Accord", 25], ["AMC Pacer", 17], ["Audi 5000", 17], ["BMW 320i", 25], ["Champ", 32], ["Chev Nova", 18], ["Civic", 28], ["Datsun 210", 35], ["Datsun 810", 20], ["Deville", 13], ["Le Car", 25], ["Linc Cont", 12], ["Horizon", 23], ["Mustang", 20], ["Peugot", 15], ["Saab 900", 20], ["Subaru", 33], ["Volvo 260", 17], ["VW Dasher", 22]]
+    },
+    {
+        "name": "Weight",
+        "type": "Set",
+        "data": [2000, 3200, 3000, 2900, 1600, 3200, 1600, 1700, 3000, 4000, 1550, 4500, 2200, 3000, 3500, 3000, 1800, 3100, 1800]
+    },
+    {
+        "name": "Car weight for 1979",
+        "type": "FunctionalDependency",
+        "data": [["Accord", 2000], ["AMC Pacer", 3200], ["Audi 5000", 3000], ["BMW 320i", 2900], ["Champ", 1600], ["Chev Nova", 3200], ["Civic", 1600], ["Datsun 210", 1700], ["Datsun 810", 3000], ["Deville", 4000], ["Le Car", 1550], ["Linc Cont", 4500], ["Horizon", 2200], ["Mustang", 3000], ["Peugot", 3500], ["Saab 900", 3000], ["Subaru", 1800], ["Volvo 260", 3100], ["VW Dasher", 1800]]
     }
 ]
