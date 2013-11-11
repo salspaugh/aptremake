@@ -7,7 +7,7 @@
 {% block body_content %}
 
 <svg id="presentation">
-    <script> render({{ design }}); </script>
+    <script> render({{ design|tojson|safe }}); </script>
 </svg>
 
 {% endblock %}
