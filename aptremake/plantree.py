@@ -133,7 +133,7 @@ class CompositionTreeNode(PlanTreeNode):
         self.add_child(p)
 
     def __repr__(self):
-        return " ".join(["COMPOSITION:"])
+        return " ".join(["COMPOSITION:", str(self.design)])
 
 class PresentationTreeNode(PlanTreeNode):
 
