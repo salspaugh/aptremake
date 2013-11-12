@@ -80,6 +80,8 @@ def mark_composition(design):
             design.encodings.remove(mark)
 
 def compose(designs):
+    if len(designs) == 1:
+        return designs[0]
     if len(designs) == 2:
         new_design = Design(designs[0].encodings + designs[1].encodings)
         double_axes_composition(new_design)
@@ -98,7 +100,7 @@ class Design(object):
         # What happens when encodings have a mix of languages.
 
     def __repr__(self):
-        return "\n\t".join([str(e) for e in self.encodings])
+        return "DESIGN: " + "\n\t".join([str(e) for e in self.encodings])
 
     def hpos(self):
         for encoding in self.encodings:

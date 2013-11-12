@@ -1,4 +1,5 @@
 
+from data import Relation
 from languages import _languages
 from ranking import rank
 from composition import compose
@@ -49,6 +50,10 @@ class RootNode(PlanTreeNode):
         Input:
         * data: a list of Relation objects
         """
+        if not isinstance(data, list):
+            raise AttributeError("Data argument must be a list.")
+        if not all([isinstance(d, Relation) for d in data]):
+            raise AttributeError("Data argument list must only contain Relation objects.")
         self.data = data
         PlanTreeNode.__init__(self)
 
@@ -77,7 +82,7 @@ class PartitionTreeNode(PlanTreeNode):
         if len(sets) == 0:
             return sets
         if len(sets) == 1:
-            return sets
+            return [[s] for s in sets[0]]
         combined = []
         if len(sets) == 2:
             for i in sets[0]:

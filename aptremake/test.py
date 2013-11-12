@@ -1,9 +1,11 @@
 
 import unittest
 
+from plantree import *
 from composition import *
 from data import *
 from languages import *
+from apt import generate_presentation
 
 CARS = "/Users/salspaugh/classes/visualization/project/aptremake/data/cars.spec"
 
@@ -86,7 +88,6 @@ class TestVerticalAxisExpression(TestBase):
     def test_nominal_ordinal_fd(self):
         assert VerticalAxis.can_express(self.data["Repair record for 1979"])
 
-
 class TestComposition(TestBase):
    
     def setUp(self):
@@ -107,6 +108,26 @@ class TestComposition(TestBase):
 
     def test_compose_haxis_vaxis_color(self):
         assert compose([self.haxis_mileage, self.vaxis_price, self.color_nation])
+
+class TestSelections(TestBase):
+    
+    def setUp(self):
+        super(TestSelections, self).setUp()
+
+    def test_mileagefd_selections(self):
+        p = PartitionTreeNode([self.data["Car mileage for 1979"]])
+        p.generate_children()
+        #print p.children
+
+class TestDesign(TestBase):
+
+    def setUp(self):
+        super(TestDesign, self).setUp()
+        self.mileage_design = generate_presentation([self.data["Car mileage for 1979"]])
+    
+    def test_mileagefd_design(self):
+        #print self.mileage_design
+        pass
 
 if __name__ == "__main__":
     unittest.main()
