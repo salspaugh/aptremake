@@ -1,13 +1,54 @@
 {% extends "base.html" %}
 
 {% block sidebar_content %}
-<p> Sidebar </p>
+    <form action="{{ url_for("design") }}" method="post">
+    <input type="hidden" name="relations" value="">
+        <div class="btn-group-vertical">
+            {% for relation, selected in relations %}
+                {% if selected %}
+                    <button type="button" class="btn btn-default active down" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}">
+                        {{ relation }}
+                    </button>
+                {% else %}
+                    <button type="button" class="btn btn-default up" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}">
+                        {{ relation }}
+                    </button>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </form>
+    <script>
+        Array.prototype.remove = function(elem) {
+            var match = -1;
+            while( (match = this.indexOf(elem)) > -1 ) {
+                this.splice(match, 1);
+            }
+        };
+        $(".btn").click(function(e) {
+            var pushed = []
+            if ($(this).hasClass("up")) {
+                pushed = $("button.down").map(function () { return $(this).attr("name") }).toArray();
+                pushed.push($(this).attr("name"));
+            } else if ($(this).hasClass("down")) {
+                pushed = $("button.down").map(function () { return $(this).attr("name") }).toArray();
+                pushed.remove($(this).attr("name"));
+            }
+            $(this).toggleClass("down");
+            $(this).toggleClass("up");
+            console.log(pushed);
+            var form = $(this).closest("form");
+            form.find("input[name=relations]").val(JSON.stringify(pushed));
+            form.submit();
+        });
+    </script>
 {% endblock %}
 
 {% block body_content %}
-
-<svg id="presentation">
-    <script> render({{ design|tojson|safe }}); </script>
-</svg>
-
+    <svg id="presentation">
+        <script> 
+            render({{ design|tojson|safe }});
+        </script>
+    </svg>
 {% endblock %}
+
+

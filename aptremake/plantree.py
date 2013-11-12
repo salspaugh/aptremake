@@ -77,7 +77,7 @@ class PartitionTreeNode(PlanTreeNode):
         if len(sets) == 0:
             return sets
         if len(sets) == 1:
-            return sets[0]
+            return sets
         combined = []
         if len(sets) == 2:
             for i in sets[0]:

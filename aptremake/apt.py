@@ -14,7 +14,8 @@ def generate_presentation(data):
 
 def test():
     data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/data/cars.spec")
-    return generate_presentation([data["Car price for 1979"], data["Car mileage for 1979"]])
+    selected = [data["Car price for 1979"], data["Car mileage for 1979"], data["Car nationality for 1979"]]
+    return generate_presentation(selected), [s.name for s in selected]
 
 test()
 

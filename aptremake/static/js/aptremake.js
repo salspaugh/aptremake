@@ -1,32 +1,32 @@
 function render(design) {
-    
-    console.log(design)
 
-    // Is the following really necessary?
-    // It appears at the top of most d3 examples.
-    var margin = {top: 10, right: 30, bottom: 30, left: 30},
-        width = 400 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+    console.log("Design being rendered:", design)
+  
+    // Constants:
+    var NUM_TICKS = 5;
+    var POINT_SIZE = 5;
+    var MARGIN = {TOP: 10, RIGHT: 30, BOTTOM: 30, LEFT: 30}, // Is this necessary?
+        WIDTH = 400 - MARGIN.LEFT - MARGIN.RIGHT,  // Such things appear at the top
+        HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM; // of most d3 examples.
       
+    // Set up the presentation space:
     svg = d3.select("#presentation")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+        .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
-    points = svg.selectAll(".hi")
+    points = svg.selectAll(".dots")
         .data(design.data)
         .enter().append("circle")
         .style("fill", "black")
-        .attr("r", 3)
+        .attr("r", POINT_SIZE)
         .attr("mark", function(d) { return d.mark; });
-        //.attr("cx", function(d) { return Math.floor(Math.random() * 100); })
-        //.attr("cy", function(d) { return Math.floor(Math.random() * 100); });
 
     if (design.haxis) {
     
         var x = d3.scale.linear()
-            .range([0, width]);
+            .range([0, WIDTH]);
 
 
         x.domain(d3.extent(design.data, function(d) { return d.hpos; })).nice();
@@ -34,34 +34,51 @@ function render(design) {
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom")
-            .ticks(5); // FIXME: Maybe this shouldn't be hard-coded.
+            .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
      
         svg.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
+            .attr("transform", "translate(0," + HEIGHT + ")")
             .call(xAxis)
            .append("text")
             .attr("class", "label")
-            .attr("x", width)
+            .attr("x", WIDTH)
             .attr("y", -6)
             .style("text-anchor", "end")
             .text(design.hlabel);
 
         points.attr("cx", function(d) { return x(d.hpos); });
 
+    } else {
+        
+        var x = d3.scale.linear()
+            .range([0, WIDTH])
+            .domain([0, 1]);
+        
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .ticks(0); // No ticks.
+     
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + HEIGHT + ")")
+            .call(xAxis);
+
+        points.attr("cx", function(d) { return Math.random(); });
     }
     
     if (design.vaxis) {
     
         var y = d3.scale.linear()
-            .range([height, 0]);
+            .range([HEIGHT, 0]);
         
         y.domain(d3.extent(design.data, function(d) { return d.vpos; })).nice();
 
         var yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
-            .ticks(5); // FIXME: Maybe this shouldn't be hard-coded.
+            .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
        
         svg.append("g")
             .attr("class", "y axis")
@@ -76,7 +93,24 @@ function render(design) {
         
         points.attr("cy", function(d) { return y(d.vpos); });
 
-    } 
+    } else {
+        var y = d3.scale.linear()
+            .range([HEIGHT, 0])
+            .domain([0, 1]);
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .ticks(0); // No ticks.
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+        
+        points.attr("cy", function(d) { return Math.random(); });
+
+    
+    }
     
     if (design.color) {
 
@@ -85,24 +119,24 @@ function render(design) {
         points.style("fill", function(d) { return color(d.color); });
 
 
-        //var legend = svg.selectAll(".legend")
-        //    .data(color.domain())
-        //    .enter().append("g")
-        //    .attr("class", "legend")
-        //    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        var legend = svg.selectAll(".legend")
+            .data(color.domain())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-        //legend.append("rect")
-        //    .attr("x", width - 18)
-        //    .attr("width", 18)
-        //    .attr("height", 18)
-        //    .style("fill", color);
+        legend.append("rect")
+            .attr("x", WIDTH - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", color);
 
-        //legend.append("text")
-        //    .attr("x", width - 24)
-        //    .attr("y", 9)
-        //    .attr("dy", ".35em")
-        //    .style("text-anchor", "end")
-        //    .text(function(d) { return d; });
+        legend.append("text")
+            .attr("x", WIDTH - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function(d) { return d; });
 
     }
 

@@ -25,11 +25,11 @@ def render(design):
     if color:
         d["color"] = True
         d["colorlabel"] = color.facts.name
-        if color.arity == 2:    
+        if color.facts.arity == 2:    
             for (mark, color) in color.facts.tuples:
                 data[mark]["mark"] = mark
                 data[mark]["color"] = color
-        elif color.arity == 1:
+        elif color.facts.arity == 1:
             for mark in color.facts.tuples:
                 data[mark]["mark"] = mark
                 data[mark]["color"] = mark
