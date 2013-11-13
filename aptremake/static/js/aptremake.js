@@ -131,7 +131,8 @@ function render(design) {
                 .range(colorbrewer.RdBu[colordomain.length]);
         }
 
-        points.style("fill", function(d) { return color(d.color); });
+        points.style("stroke", "black")
+            .style("fill", function(d) { return color(d.color); });
 
         var legend = svg.selectAll(".legend")
             .data(color.domain())
