@@ -91,10 +91,12 @@ class Color(RetinalList):
     def can_express(cls, relation):
         if RetinalList.can_encode(relation):
             if (isinstance(relation, FunctionalDependency) \
-                and relation.range.type == Type.nominal) \
+                and (relation.range.type == Type.nominal \
+                    or (relation.range.type == Type.ordinal and len(relation.range.tuples) < 11))) \
                 or \
                 (isinstance(relation, Set) \
-                and relation.type == Type.nominal):
+                and (relation.type == Type.nominal \
+                    or (relation.type == Type.ordinal and len(relation.tuples) < 11))):
                 return True
         return False
     
