@@ -156,14 +156,14 @@ function render(design) {
             .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
         legend.append("rect")
-            .attr("x", WIDTH + 100)
+            .attr("x", WIDTH + 90) // TODO: Make distance from plot dependent on data.
             .attr("width", 18)
             .attr("height", 18)
             .style("fill", color)
             .style("stroke", "black");
 
         legend.append("text")
-            .attr("x", WIDTH + 94)
+            .attr("x", WIDTH + 84)
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "end")

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <style>
     body {
         font: 10px sans-serif;
@@ -17,7 +16,6 @@
         stroke: #000;
     }
     </style>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automatic Presentation Tool</title>
@@ -32,13 +30,20 @@
     {% endblock %}
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
+    <div class="container" style="padding-top: 20px">
+        {% block tab_content %} 
+        <ul class="nav nav-tabs">
+        <li class="active"><a href="#">Cars</a></li>
+        <li><a href="#">Classes</a></li>
+        <li><a href="#">Ozone</a></li>
+        </ul>
+        {% endblock %}
+        <div class="row" style="padding-top: 50px">
+            <div class="col-md-3">
                 {% block sidebar_content %}
                 {% endblock %}
             </div>
-            <div class="col-md-8">
+            <div class="col-md-9">
                 {% block body_content %}
                 {% endblock %}
             </div>
