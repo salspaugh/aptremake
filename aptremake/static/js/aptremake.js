@@ -8,6 +8,8 @@ function render(design) {
     var MARGIN = {TOP: 10, RIGHT: 30, BOTTOM: 30, LEFT: 30}, // Is this necessary?
         WIDTH = 400 - MARGIN.LEFT - MARGIN.RIGHT,  // Such things appear at the top
         HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM; // of most d3 examples.
+    var INVISIBLE_AXIS_HEIGHT = HEIGHT/4;
+    var INVISIBLE_AXIS_WIDTH = WIDTH/4;
       
     // Set up the presentation space:
     svg = d3.select("#presentation")
@@ -52,7 +54,7 @@ function render(design) {
     } else {
         
         var x = d3.scale.linear()
-            .range([0, WIDTH])
+            .range([0, INVISIBLE_AXIS_WIDTH])
             .domain([0, 1]);
         
         var xAxis = d3.svg.axis()
@@ -65,11 +67,11 @@ function render(design) {
             .attr("transform", "translate(0," + HEIGHT + ")")
             .call(xAxis);
 
-        points.attr("cx", function(d) { return Math.random(); });
+        points.attr("cx", function(d) { return x(Math.random()); });
     }
     
     if (design.vaxis) {
-    
+        
         var y = d3.scale.linear()
             .range([HEIGHT, 0]);
         
@@ -94,8 +96,9 @@ function render(design) {
         points.attr("cy", function(d) { return y(d.vpos); });
 
     } else {
+        
         var y = d3.scale.linear()
-            .range([HEIGHT, 0])
+            .range([HEIGHT, HEIGHT-INVISIBLE_AXIS_HEIGHT])
             .domain([0, 1]);
 
         var yAxis = d3.svg.axis()
@@ -106,9 +109,11 @@ function render(design) {
         svg.append("g")
             .attr("class", "y axis")
             .call(yAxis);
-        
-        points.attr("cy", function(d) { return Math.random(); });
 
+        //d3.selectAll(".axis path")
+        //    .style("stroke", "white");
+
+        points.attr("cy", function(d) { return y(Math.random()); });
     
     }
     
@@ -116,8 +121,17 @@ function render(design) {
 
         var color = d3.scale.category10();
 
-        points.style("fill", function(d) { return color(d.color); });
+        if (design.color_ordinal) {
+            var colordomain = _.uniq(_.map(design.data, 
+                                    function(d) { return d.color } ));
+            console.log(colordomain);
 
+            var color = d3.scale.ordinal()
+                .domain(colordomain)
+                .range(colorbrewer.RdBu[colordomain.length]);
+        }
+
+        points.style("fill", function(d) { return color(d.color); });
 
         var legend = svg.selectAll(".legend")
             .data(color.domain())
