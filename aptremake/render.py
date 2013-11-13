@@ -1,5 +1,6 @@
 
 from collections import defaultdict
+from data import Type
 
 def render(design):
     d = {}
@@ -26,10 +27,14 @@ def render(design):
         d["color"] = True
         d["colorlabel"] = color.facts.name
         if color.facts.arity == 2:    
+            if color.facts.range.type == Type.ordinal:
+                d["color_ordinal"] = True
             for (mark, color) in color.facts.tuples:
                 data[mark]["mark"] = mark
                 data[mark]["color"] = color
         elif color.facts.arity == 1:
+            if color.facts.type == Type.ordinal:
+                d["color_ordinal"] = True
             for mark in color.facts.tuples:
                 data[mark]["mark"] = mark
                 data[mark]["color"] = mark
