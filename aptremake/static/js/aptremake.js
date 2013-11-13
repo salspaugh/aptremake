@@ -22,7 +22,8 @@ function render(design) {
     points = svg.selectAll(".dots")
         .data(design.data)
         .enter().append("circle")
-        .style("fill", "black")
+        .style("fill", "#BBB")
+        .style("stroke", "black")
         .attr("r", POINT_SIZE)
         .attr("mark", function(d) { return d.mark; });
 
@@ -158,7 +159,8 @@ function render(design) {
             .attr("x", WIDTH + 100)
             .attr("width", 18)
             .attr("height", 18)
-            .style("fill", color);
+            .style("fill", color)
+            .style("stroke", "black");
 
         legend.append("text")
             .attr("x", WIDTH + 94)
