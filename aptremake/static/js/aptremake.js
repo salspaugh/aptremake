@@ -5,7 +5,7 @@ function render(design) {
     // Constants:
     var NUM_TICKS = 5;
     var POINT_SIZE = 5;
-    var MARGIN = {TOP: 40, RIGHT: 30, BOTTOM: 50, LEFT: 60}, // Is this necessary?
+    var MARGIN = {TOP: 40, RIGHT: 30, BOTTOM: 50, LEFT: 70}, // Is this necessary?
         WIDTH = 400 - MARGIN.LEFT - MARGIN.RIGHT,  // Such things appear at the top
         WIDTH_PLUS = WIDTH + 500;
         HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM; // of most d3 examples.
@@ -33,7 +33,7 @@ function render(design) {
             .range([0, WIDTH]);
         x.domain(d3.extent(design.data, function(d) { return d.hpos; })).nice();
         
-        if (design.hpos_ordinal) {
+        if (design.hpos_ordinal || design.hpos_nominal) {
             var x = d3.scale.ordinal()
                 .rangePoints([0, WIDTH], 1)
                 .domain(_.uniq(_.map(design.data, 
@@ -85,7 +85,7 @@ function render(design) {
         
         y.domain(d3.extent(design.data, function(d) { return d.vpos; })).nice();
         
-        if (design.vpos_ordinal) {
+        if (design.vpos_ordinal || design.vpos_nominal) {
             var y = d3.scale.ordinal()
                 .rangePoints([HEIGHT, 0], 1)
                 .domain(_.uniq(_.map(design.data, 

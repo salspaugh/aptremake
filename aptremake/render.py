@@ -10,6 +10,8 @@ def render(design):
     if hpos: # FIXME: Can have more than one hpos / vpos encoding.
         if hpos.facts.range.type == Type.ordinal:
             d["hpos_ordinal"] = True
+        if hpos.facts.range.type == Type.nominal:
+            d["hpos_nominal"] = True
         d["haxis"] = True
         d["hlabel"] = hpos.facts.name
         for (mark, hpos) in hpos.facts.tuples:
@@ -20,6 +22,8 @@ def render(design):
     if vpos:
         if vpos.facts.range.type == Type.ordinal:
             d["vpos_ordinal"] = True
+        if vpos.facts.range.type == Type.nominal:
+            d["vpos_nominal"] = True
         d["vaxis"] = True
         d["vlabel"] = vpos.facts.name
         for (mark, vpos) in vpos.facts.tuples:
