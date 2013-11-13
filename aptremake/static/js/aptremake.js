@@ -5,15 +5,16 @@ function render(design) {
     // Constants:
     var NUM_TICKS = 5;
     var POINT_SIZE = 5;
-    var MARGIN = {TOP: 10, RIGHT: 30, BOTTOM: 30, LEFT: 30}, // Is this necessary?
+    var MARGIN = {TOP: 30, RIGHT: 30, BOTTOM: 50, LEFT: 50}, // Is this necessary?
         WIDTH = 400 - MARGIN.LEFT - MARGIN.RIGHT,  // Such things appear at the top
+        WIDTH_PLUS = WIDTH + 500;
         HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM; // of most d3 examples.
     var INVISIBLE_AXIS_HEIGHT = HEIGHT/4;
     var INVISIBLE_AXIS_WIDTH = WIDTH/4;
       
     // Set up the presentation space:
     svg = d3.select("#presentation")
-        .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+        .attr("width", WIDTH_PLUS)
         .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
        .append("g")
         .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
@@ -29,7 +30,6 @@ function render(design) {
     
         var x = d3.scale.linear()
             .range([0, WIDTH]);
-
 
         x.domain(d3.extent(design.data, function(d) { return d.hpos; })).nice();
         
@@ -140,13 +140,13 @@ function render(design) {
             .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
         legend.append("rect")
-            .attr("x", WIDTH - 18)
+            .attr("x", WIDTH + 100)
             .attr("width", 18)
             .attr("height", 18)
             .style("fill", color);
 
         legend.append("text")
-            .attr("x", WIDTH - 24)
+            .attr("x", WIDTH + 94)
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "end")
