@@ -11,13 +11,13 @@
     <form action="{{ url_for("design") }}" method="post">
     <input type="hidden" name="relations" value="">
         <div class="btn-group-vertical">
-            {% for relation, selected in relations %}
+            {% for relation, selected, importance in buttons %}
                 {% if selected %}
-                    <button type="button" class="btn btn-default active down" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}">
+                    <button type="button" class="btn btn-default btn-sm active down" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}" importance={{ importance }}>
                         {{ relation }}
                     </button>
                 {% else %}
-                    <button type="button" class="btn btn-default up" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}">
+                    <button type="button" class="btn btn-default btn-sm up" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}" importance="-1">
                         {{ relation }}
                     </button>
                 {% endif %}
@@ -25,20 +25,20 @@
         </div>
     </form>
     <script>
-        Array.prototype.remove = function(elem) {
-            var match = -1;
-            while( (match = this.indexOf(elem)) > -1 ) {
-                this.splice(match, 1);
-            }
-        };
         $(".btn").click(function(e) {
             var pushed = []
             if ($(this).hasClass("up")) {
-                pushed = $("button.down").map(function () { return $(this).attr("name") }).toArray();
-                pushed.push($(this).attr("name"));
+                pushed = $("button.down").map(function () { return $(this) }).toArray();
+                pushed = _.map(pushed, function(d) { return {"name": d.attr("name"), "importance": d.attr("importance")}; });
+                var importance = pushed.length;
+                $(this).attr("importance", importance);
+                pushed.push({"name": $(this).attr("name"), "importance": importance});
             } else if ($(this).hasClass("down")) {
-                pushed = $("button.down").map(function () { return $(this).attr("name") }).toArray();
-                pushed.remove($(this).attr("name"));
+                var unclicked_name = $(this).attr("name");
+                pushed = $("button.down").map(function () { return $(this) }).toArray();
+                pushed = _.map(pushed, function(d) { return {"name": d.attr("name"), "importance": d.attr("importance")}; });
+                pushed = _.reject(pushed, function(d) { return d.name == unclicked_name; });
+                $(this).attr("importance", -1);
             }
             $(this).toggleClass("down");
             $(this).toggleClass("up");

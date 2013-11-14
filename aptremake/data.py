@@ -12,6 +12,8 @@ class Relation(object):
     
     def __init__(self, name=""):
         self.name = name
+        self.selected = False # FIXME: These attributes are tied to the
+        self.importance = -1 # visualization rendering and probably shouldn't be here.
 
 class Set(Relation):
     
