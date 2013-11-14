@@ -42,7 +42,6 @@
             }
             $(this).toggleClass("down");
             $(this).toggleClass("up");
-            console.log(pushed);
             var form = $(this).closest("form");
             form.find("input[name=relations]").val(JSON.stringify(pushed));
             form.submit();
