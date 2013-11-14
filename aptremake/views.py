@@ -22,7 +22,6 @@ def design():
         relation.selected = True if name in selected else False
     relations = [(r.name, r.selected) for r in relations.values()]
     relations.sort(key=lambda x: len(x[0]))
-    print design, relations
     return render_template("index.html", design=design, relations=relations)
 
 @app.route("/data/<path:filename>")

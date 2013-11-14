@@ -45,7 +45,7 @@
         "type": "ORDINAL",
         "domain": "Repair",
         "arity": 1,
-        "data": ["Terrible", "Bad", "OK", "Good", "Great"]
+        "data": ["Great", "Good", "OK", "Bad", "Terrible"]
     },
     {
         "name": "Repair record for 1979",

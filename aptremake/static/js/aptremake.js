@@ -34,13 +34,17 @@ function render(design) {
         x.domain(d3.extent(design.data, function(d) { return d.hpos; })).nice();
         
         if (design.hpos_ordinal || design.hpos_nominal) {
+
+            var hdomain = _.uniq(_.map(design.data, 
+                                function(d) { return d.hpos } ));
+            if (design.hpos_ordinal) {
+                hdomain = _.sortBy(hdomain, function(d) { return design.hordering[d] });
+            }
             var x = d3.scale.ordinal()
                 .rangePoints([0, WIDTH], 1)
-                .domain(_.uniq(_.map(design.data, 
-                                function(d) { return d.hpos } )));
+                .domain(hdomain);
         }
 
-        
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom")
@@ -86,10 +90,15 @@ function render(design) {
         y.domain(d3.extent(design.data, function(d) { return d.vpos; })).nice();
         
         if (design.vpos_ordinal || design.vpos_nominal) {
+
+            var vdomain = _.uniq(_.map(design.data, 
+                                function(d) { return d.vpos } ));
+            if (design.vpos_ordinal) {
+                vdomain = _.sortBy(vdomain, function(d) { return design.vordering[d] });
+            }
             var y = d3.scale.ordinal()
                 .rangePoints([HEIGHT, 0], 1)
-                .domain(_.uniq(_.map(design.data, 
-                                function(d) { return d.vpos } )));
+                .domain(vdomain);
         }
 
         var yAxis = d3.svg.axis()
@@ -139,7 +148,7 @@ function render(design) {
         if (design.color_ordinal) {
             var colordomain = _.uniq(_.map(design.data, 
                                     function(d) { return d.color } ));
-            console.log(colordomain);
+            colordomain = _.sortBy(colordomain, function(d) { return design.colorordering[d] });
 
             var color = d3.scale.ordinal()
                 .domain(colordomain)
