@@ -14,8 +14,8 @@ def generate_presentation(data):
 
 def test():
     data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/data/cars.spec")
-    apt_input = [data["Car price for 1979"], data["Car mileage for 1979"], data["Car nationality for 1979"]]
+    apt_input = [data["Car mileage for 1979"], data["Car price for 1979"], data["Car nationality for 1979"]]
     selection_data = [s.name for s in apt_input]
-    selection_data = zip(selection_data, range(len(selection_data)))
+    selection_data = zip(selection_data, range(1, len(selection_data)+1))
     selection_data = [{"name": s, "importance": i} for (s, i) in selection_data]
     return generate_presentation(apt_input), selection_data

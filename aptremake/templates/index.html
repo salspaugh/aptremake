@@ -7,38 +7,45 @@
     </ul>
 {% endblock %}
 
-{% block sidebar_content %}
+{% block left_sidebar_content %}
+    <div>
+    <p><b>RELATIONS</b></p>
     <form action="{{ url_for("design") }}" method="post">
     <input type="hidden" name="relations" value="">
         <div class="btn-group-vertical">
-            {% for relation, selected, importance in buttons %}
-                {% if selected %}
-                    <button type="button" class="btn btn-default btn-sm active down" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}" importance={{ importance }}>
-                        {{ relation }}
+            {% for button in buttons %}
+                {% if button["selected"] %}
+                    <button type="button" class="btn btn-default btn-sm active down" data-toggle="button" 
+                        id="button_{{ button["name"]|replace(" ", "_") }}" name="{{ button["name"] }}" importance={{ button["importance"] }}>
+                        {{ button["name"] }}
                     </button>
                 {% else %}
-                    <button type="button" class="btn btn-default btn-sm up" data-toggle="button" id="button_{{ relation|replace(" ", "_") }}" name="{{ relation }}" importance="-1">
-                        {{ relation }}
+                    <button type="button" class="btn btn-default btn-sm up" data-toggle="button" 
+                        id="button_{{ button["name"]|replace(" ", "_") }}" name="{{ button["name"] }}" importance="-1">
+                        {{ button["name"] }}
                     </button>
                 {% endif %}
             {% endfor %}
         </div>
     </form>
+    </div>
     <script>
         $(".btn").click(function(e) {
             var pushed = []
             if ($(this).hasClass("up")) {
                 pushed = $("button.down").map(function () { return $(this) }).toArray();
-                pushed = _.map(pushed, function(d) { return {"name": d.attr("name"), "importance": d.attr("importance")}; });
-                var importance = pushed.length;
+                pushed = _.map(pushed, function(d) { return {"name": d.attr("name"), "importance": parseInt(d.attr("importance"))}; });
+                var importance = pushed.length + 1;
                 $(this).attr("importance", importance);
                 pushed.push({"name": $(this).attr("name"), "importance": importance});
             } else if ($(this).hasClass("down")) {
                 var unclicked_name = $(this).attr("name");
+                var unclicked_importance = parseInt($(this).attr("importance"));
                 pushed = $("button.down").map(function () { return $(this) }).toArray();
-                pushed = _.map(pushed, function(d) { return {"name": d.attr("name"), "importance": d.attr("importance")}; });
+                pushed = _.map(pushed, function(d) { return {"name": d.attr("name"), "importance": parseInt(d.attr("importance"))}; });
+                _.each(pushed, function(d) { if (d.importance > unclicked_importance) { d.importance = d.importance - 1; } });
                 pushed = _.reject(pushed, function(d) { return d.name == unclicked_name; });
-                $(this).attr("importance", -1);
+                $(this).attr("importance", "-1");
             }
             $(this).toggleClass("down");
             $(this).toggleClass("up");
@@ -49,6 +56,21 @@
     </script>
 {% endblock %}
 
+{% block right_sidebar_content %}
+    <div> 
+        <p><b>INPUT</b></p>
+        <div style="border:1px solid #BBB; border-radius:4px; height:200px;"> 
+        {% for button in buttons|sort(attribute="importance") %}
+            <ul style="list-style-type:none; padding:0; margin:5px">
+                {% if button["selected"] %}
+                    <li> {{ button["name"] }} </li>
+                {% endif %}
+            </ul>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
 {% block body_content %}
     <svg id="presentation">
         <script> 
@@ -56,5 +78,3 @@
         </script>
     </svg>
 {% endblock %}
-
-

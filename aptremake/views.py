@@ -23,8 +23,9 @@ def design():
     for s in selection_data:
         relations[s["name"]].selected = True
         relations[s["name"]].importance = s["importance"]
-    button_data = [(r.name, r.selected, r.importance) for r in relations.values()]
-    button_data.sort(key=lambda x: len(x[0]))
+    print selection_data
+    button_data = [{"name": r.name, "selected": r.selected, "importance": r.importance} for r in relations.values()]
+    button_data.sort(key=lambda x: len(x["name"]))
     return render_template("index.html", design=design, buttons=button_data)
 
 @app.route("/data/<path:filename>")
