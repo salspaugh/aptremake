@@ -20,11 +20,10 @@ class TestColorExpression(TestBase):
         super(TestColorExpression, self).setUp()
         
     def test_nominal_set(self): 
-        assert not Color.can_express(self.data["Repair"])
         assert Color.can_express(self.data["Nation"])
 
     def test_ordinal_set(self):
-        assert not Color.can_express(self.data["Repair"])
+        assert Color.can_express(self.data["Repair"])
 
     def test_quantitative_set(self):
         assert not Color.can_express(self.data["Weight"])
@@ -33,7 +32,7 @@ class TestColorExpression(TestBase):
         assert Color.can_express(self.data["Car nationality for 1979"])
 
     def test_nominal_ordinal_fd(self):
-        assert not Color.can_express(self.data["Repair record for 1979"])
+        assert Color.can_express(self.data["Repair record for 1979"])
 
     def test_nominal_quantitative_fd(self):
         assert not Color.can_express(self.data["Car mileage for 1979"])
@@ -101,7 +100,7 @@ class TestComposition(TestBase):
         assert compose([self.haxis_mileage, self.vaxis_price])
 
     def test_compose_haxis_haxis(self):
-        assert not compose([self.haxis_price, self.haxis_mileage])
+        assert compose([self.haxis_price, self.haxis_mileage])
 
     def test_compose_haxis_color(self):
         assert compose([self.haxis_price, self.color_nation])
