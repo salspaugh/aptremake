@@ -12,6 +12,7 @@ quantitative = [
     Task.density,
     Task.saturation,
     Task.hue,
+    Task.mark
 ]
 
 ordinal = [
@@ -27,6 +28,7 @@ ordinal = [
     Task.slope,
     Task.area,
     Task.volume,
+    Task.mark
 ]
 
 nominal = [
@@ -43,6 +45,7 @@ nominal = [
     Task.slope,
     Task.area,
     Task.volume,
+    Task.mark
 ]
 
 ranking_lists = {
@@ -56,13 +59,15 @@ def rank(partition, designs):
     if isinstance(partition, Set):
         type = partition.type
     if isinstance(partition, FunctionalDependency):
-        type = partition.range.type
+        type = partition.dependent.type
     if isinstance(partition, CartesianProduct):
         type = partition.sets[0].type
-    ranking_list = ranking_lists[type]
     ranks = {}
     for design in designs:
-        ranks[design] = ranking_list.index(design.language.task)
+        rank = []
+        for (name, (type, task)) in design.tasks.iteritems():
+            rank.append(ranking_lists[type].index(task))
+        ranks[design] = "".join([str(r) for r in rank])
     ranks = sorted(ranks.items(), key=lambda x: x[1])
     return [r[0] for r in ranks]
     

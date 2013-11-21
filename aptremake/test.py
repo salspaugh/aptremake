@@ -91,22 +91,33 @@ class TestComposition(TestBase):
    
     def setUp(self):
         super(TestComposition, self).setUp()
+        
+
         self.haxis_price = HorizontalAxis.design(self.data["Car price for 1979"])
         self.haxis_mileage = HorizontalAxis.design(self.data["Car mileage for 1979"])
+        self.haxis_car = HorizontalAxis.design(self.data["Car"])
+
         self.vaxis_price = VerticalAxis.design(self.data["Car price for 1979"])
-        self.color_nation = Color.design(self.data["Car nationality for 1979"])
+        self.vaxis_mileage = VerticalAxis.design(self.data["Car mileage for 1979"])
+        self.vaxis_weight = VerticalAxis.design(self.data["Car weight for 1979"])
+        
+        self.color_nationality = Color.design(self.data["Car nationality for 1979"])
+        self.color_repair = Color.design(self.data["Repair record for 1979"])
 
     def test_compose_haxis_vaxis(self):
         assert compose([self.haxis_mileage, self.vaxis_price])
 
     def test_compose_haxis_haxis(self):
-        assert compose([self.haxis_price, self.haxis_mileage])
+        assert not compose([self.haxis_price, self.haxis_mileage])
 
     def test_compose_haxis_color(self):
-        assert compose([self.haxis_price, self.color_nation])
+        assert compose([self.haxis_price, self.color_nationality])
 
     def test_compose_haxis_vaxis_color(self):
-        assert compose([self.haxis_mileage, self.vaxis_price, self.color_nation])
+        assert compose([self.haxis_mileage, self.vaxis_price, self.color_nationality])
+
+    def test_compose_haxis_vaxis_color_color(self):
+        assert not compose([self.haxis_price, self.vaxis_mileage, self.color_nationality, self.color_repair])
 
 class TestSelections(TestBase):
     
@@ -116,7 +127,6 @@ class TestSelections(TestBase):
     def test_mileagefd_selections(self):
         p = PartitionTreeNode([self.data["Car mileage for 1979"]])
         p.generate_children()
-        #print p.children
 
 class TestDesign(TestBase):
 
@@ -125,8 +135,8 @@ class TestDesign(TestBase):
         self.mileage_design = generate_presentation([self.data["Car mileage for 1979"]])
     
     def test_mileagefd_design(self):
-        #print self.mileage_design
-        pass
+        print self.mileage_design
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
+    unittest.TextTestRunner(verbosity=2).run(TestDesign("test_mileagefd_design"))

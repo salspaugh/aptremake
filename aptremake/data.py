@@ -10,7 +10,7 @@ class Type(object):
 
 class Relation(object):
     
-    def __init__(self, name=""):
+    def __init__(self, name=""): # FIXME: Make name required
         self.name = name
         self.selected = False # FIXME: These attributes are tied to the
         self.importance = -1 # visualization rendering and probably shouldn't be here.
@@ -22,6 +22,8 @@ class Set(Relation):
         self.arity = None
         self.type = None
         self.domain = None
+        self.determinant = self
+        self.dependent = self # TODO: Verify that this isn't some awful bastard thing to do.
         Relation.__init__(self, name=name)
 
     def __repr__(self):
@@ -30,14 +32,14 @@ class Set(Relation):
 class FunctionalDependency(Relation):
     
     def __init__(self, name=""):
-        self.domain = None
-        self.range = None
+        self.determinant = None
+        self.dependent = None
         self.arity = None
         self.tuples = None
         Relation.__init__(self, name=name)
 
     def __repr__(self):
-        return " ".join(["FunctionalDependency:", self.name, "(domain:", str(self.domain), "range:", str(self.range) + ")"])
+        return " ".join(["FunctionalDependency:", self.name, "(determinant:", str(self.determinant), "dependent:", str(self.dependent) + ")"])
 
 class CartesianProduct(Relation):
     
@@ -70,6 +72,6 @@ def read_data(specfilename):
             data[s["name"]] = d
         for s in spec:
             if s["class"] == "FunctionalDependency":
-                data[s["name"]].domain = data[s["domain"]]
-                data[s["name"]].range = data[s["range"]]
+                data[s["name"]].determinant = data[s["domain"]]
+                data[s["name"]].dependent = data[s["range"]]
     return data

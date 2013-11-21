@@ -5,7 +5,7 @@ function render(design) {
     // Constants:
     var NUM_TICKS = 5;
     var POINT_SIZE = 5;
-    var MARGIN = {TOP: 40, RIGHT: 30, BOTTOM: 50, LEFT: 70}, // Is this necessary?
+    var MARGIN = {TOP: 40, RIGHT: 50, BOTTOM: 90, LEFT: 70}, // Is this necessary?
         WIDTH = 400 - MARGIN.LEFT - MARGIN.RIGHT,  // Such things appear at the top
         WIDTH_PLUS = WIDTH + 500;
         HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM; // of most d3 examples.
@@ -19,13 +19,23 @@ function render(design) {
        .append("g")
         .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
-    points = svg.selectAll(".dots")
-        .data(design.data)
-        .enter().append("circle")
-        .style("fill", "#BBB")
-        .style("stroke", "black")
-        .attr("r", POINT_SIZE)
-        .attr("mark", function(d) { return d.mark; });
+    if (design.marktype == "dot") {
+        dots = svg.selectAll(".dot") // TODO: Figure out if I should put "var" here.
+            .data(design.data)
+            .enter().append("circle")
+            .style("fill", "#BBB")
+            .style("stroke", "black")
+            .attr("r", POINT_SIZE)
+            .attr("mark", function(d) { return d.mark; });
+    }
+    else if (design.marktype == "bar") {
+        bars = svg.selectAll(".bar")
+            .data(design.data)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .style("fill", "#BBB")
+            .style("stroke", "black");
+    }
 
     if (design.haxis) {
     
@@ -41,7 +51,8 @@ function render(design) {
                 hdomain = _.sortBy(hdomain, function(d) { return design.hordering[d] });
             }
             var x = d3.scale.ordinal()
-                .rangePoints([0, WIDTH], 1)
+                //.rangePoints([0, WIDTH], 1)
+                .rangeRoundBands([0, WIDTH], .1)
                 .domain(hdomain);
         }
 
@@ -50,19 +61,35 @@ function render(design) {
             .orient("bottom")
             .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
      
-        svg.append("g")
+        xAxisCall = svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + HEIGHT + ")")
-            .call(xAxis)
-           .append("text")
+            .call(xAxis);
+        xAxisCall.selectAll("text")  
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", function(d) { return "rotate(-90)" });
+        xAxisCall.append("text")
             .attr("class", "label")
             .attr("x", WIDTH)
             .attr("y", -6)
             .style("text-anchor", "end")
             .text(design.hlabel);
-
-        points.attr("cx", function(d) { return x(d.hpos); });
-
+        
+        if (design.marktype == "dot") {
+            dots.attr("cx", function(d) { return x(d.hpos); });
+        }
+        else if (design.marktype == "bar") {
+            if (design.sideways) {
+                bars.attr("x", function(d) { return x(d.hpos); })
+                    .attr("width", function(d) { return WIDTH - x(d.hpos); });
+            } 
+            else {
+                bars.attr("x", function(d) { return x(d.hpos); })
+                    .attr("width", x.rangeBand())
+            }
+        }
     } else {
         
         var x = d3.scale.linear()
@@ -79,7 +106,11 @@ function render(design) {
             .attr("transform", "translate(0," + HEIGHT + ")")
             .call(xAxis);
 
-        points.attr("cx", function(d) { return x(Math.random()); });
+        if (design.marktype == "dot") {
+            dots.attr("cx", function(d) { return x(Math.random()); });
+        } else if (design.marktype == "bar") {
+            // TODO: Check: This shouldn't happen.
+        }
     }
     
     if (design.vaxis) {
@@ -117,8 +148,18 @@ function render(design) {
             .style("text-anchor", "end")
             .text(design.vlabel)
         
-        points.attr("cy", function(d) { return y(d.vpos); });
-
+        if (design.marktype == "dot") {
+            dots.attr("cy", function(d) { return y(d.vpos); });
+        } else if (design.marktype == "bar") {
+            if (design.sideways) {
+                bars.attr("y", function(d) { return y(d.vpos); })
+                    .attr("height", y.rangeBand())
+            } 
+            else {
+                bars.attr("y", function(d) { return y(d.vpos); })
+                    .attr("height", function(d) { return HEIGHT - y(d.vpos); });
+            }
+        }
     } else {
         
         var y = d3.scale.linear()
@@ -134,10 +175,14 @@ function render(design) {
             .attr("class", "y axis")
             .call(yAxis);
 
+        // TODO: Figure out how to make this extra axis invisible.
         //d3.selectAll(".axis path")
         //    .style("stroke", "white");
-
-        points.attr("cy", function(d) { return y(Math.random()); });
+        if (design.marktype == "dot") {
+            dots.attr("cy", function(d) { return y(Math.random()); });
+        } else if (design.marktype == "bar") {
+            // TODO: Check: This shouldn't happen.
+        }
     
     }
     
@@ -154,9 +199,13 @@ function render(design) {
                 .domain(colordomain)
                 .range(colorbrewer.RdBu[colordomain.length]);
         }
-
-        points.style("stroke", "black")
-            .style("fill", function(d) { return color(d.color); });
+        if (design.marktype == "dot") {
+            dots.style("stroke", "black")
+                .style("fill", function(d) { return color(d.color); });
+        } else if (design.marktype == "bar") {
+            bars.style("stroke", "black")
+                .style("fill", function(d) { return color(d.color); });
+        }
 
         var legend = svg.selectAll(".legend")
             .data(color.domain())
