@@ -13,7 +13,7 @@ def generate_presentation(data):
         stack = node.children + stack
 
 def test():
-    data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/data/cars.spec")
+    data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec")
     #apt_input = [data["Car mileage for 1979"], data["Car price for 1979"], data["Car nationality for 1979"]]
     apt_input = [data["Car mileage for 1979"]]
     selection_data = [s.name for s in apt_input]
