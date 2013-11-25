@@ -1,6 +1,7 @@
 
 from collections import defaultdict
 from data import Type
+from random import randint
 
 def render_horizontal_axes(design, display, data):
      # FIXME: Can have more than one hpos / vpos encoding.
@@ -64,18 +65,131 @@ def render_color(design, display, data):
                 data[mark]["color"] = mark
 
 def render(design):
-    display = {}
-    data = defaultdict(dict)
 
-    display["marktype"] = design.marktype()
-    
-    render_horizontal_axes(design, display, data)
-    render_vertical_axes(design, display, data)     
-    render_color(design, display, data)    
-    
-    data = data.values()
+    #display = {}
+    #data = defaultdict(dict)
+    #display["marktype"] = design.marktype()
+    #render_horizontal_axes(design, display, data)
+    #render_vertical_axes(design, display, data)     
+    #render_color(design, display, data)    
+    #data = data.values()
+    #display["data"] = data
 
-    display["data"] = data
-    print display
-    return display
+    plot = {
+        "numrows": 2,
+        "numcols": 3,
+        "subplots": [
+            {
+                "rowidx": 0,
+                "colidx": 0,
+                "haxis": True,
+                "vaxis": True,
+                "marktype": "point",
+                "markclass": ".dot",
+                "marktag": "circle",
+                "hpos": "val",
+                "vpos": "val" 
+            },
+            {
+                "rowidx": 0,
+                "colidx": 1,
+                "haxis": True,
+                "vaxis": True,
+                "marktype": "point",
+                "markclass": ".dot",
+                "marktag": "circle",
+                "hpos": "val",
+                "vpos": "val" 
+            },
+            {
+                "rowidx": 0,
+                "colidx": 2,
+                "haxis": True,
+                "vaxis": True,
+                "marktype": "point",
+                "markclass": ".dot",
+                "marktag": "circle",
+                "hpos": "val",
+                "vpos": "val" 
+            },
+            {
+                "rowidx": 1,
+                "colidx": 0,
+                "haxis": True,
+                "vaxis": True,
+                "marktype": "point",
+                "markclass": ".dot",
+                "marktag": "circle",
+                "hpos": "val",
+                "vpos": "val" 
+            },
+            {
+                "rowidx": 1,
+                "colidx": 1,
+                "haxis": True,
+                "vaxis": True,
+                "marktype": "point",
+                "markclass": ".dot",
+                "marktag": "circle",
+                "hpos": "val",
+                "vpos": "val" 
+            },
+            {
+                "rowidx": 1,
+                "colidx": 2,
+                "haxis": True,
+                "vaxis": True,
+                "vaxis": True,
+                "marktype": "point",
+                "markclass": ".dot",
+                "marktag": "circle",
+                "hpos": "val",
+                "vpos": "val" 
+            }
+        ],
+        "data" : [
+            {
+                "id": 0,
+                "val": randint(1,100)
+            },
+            {
+                "id": 1,
+                "val": randint(1,100)
+            },
+            {
+                "id": 2,
+                "val": randint(1,100)
+            },
+            {
+                "id": 3,
+                "val": randint(1,100)
+            },
+            {
+                "id": 4,
+                "val": randint(1,100)
+            },
+            {
+                "id": 5,
+                "val": randint(1,100)
+            },
+            {
+                "id": 6,
+                "val": randint(1,100)
+            },
+            {
+                "id": 7,
+                "val": randint(1,100)
+            },
+            {
+                "id": 8,
+                "val": randint(1,100)
+            },
+            {
+                "id": 9,
+                "val": randint(1,100)
+            }
+        ]
+    }
+    
+    return plot
 
