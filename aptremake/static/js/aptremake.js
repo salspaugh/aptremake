@@ -5,14 +5,52 @@ function render(plot) {
   // Important constants:
   var MARGIN = {TOP: 20, RIGHT: 10, BOTTOM: 70, LEFT: 50};
   var WIDTH = 650; 
+  var WIDTH_PLUS = 750;
   var HEIGHT = 650; 
   var NUM_TICKS = 5;
 
-  function drawColor(marks) {
+  function drawColor(outerContainer) {
+    if (plot.hasColor) {
+      var color = d3.scale.category10();
+
+      if (plot.color_ordinal) {
+        var colordomain = _.uniq(_.map(plot.data, 
+                    function(d) { return d.color } ));
+        colordomain = _.sortBy(colordomain, function(d) { return plot.cordering[d] });
+
+        var color = d3.scale.ordinal()
+          .domain(colordomain)
+          .range(colorbrewer.RdBu[colordomain.length]);
+      }
+      
+      d3.selectAll(".mark")
+        .style("stroke", "black")
+        .style("fill", function(d) { return color(d[plot.color]); });
+
+      console.log(color.domain());
+
+      var legend = outerContainer.selectAll(".legend")
+        .data(color.domain())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(0," + (i*20 + MARGIN.TOP) + ")"; });
+      legend.append("rect")
+        .attr("x", WIDTH + 80)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color)
+        .style("stroke", "black");
+      legend.append("text")
+        .attr("x", WIDTH + 74)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return d; });
+    }
   }
 
   function drawVerticalAxis(marks, subplot, subplotContainer, width, height) {
-    if (subplot.vaxis) {
+    if (subplot.hasVaxis) {
       
       var y = d3.scale.linear()
         .range([height, 0]);
@@ -49,11 +87,11 @@ function render(plot) {
         marks.attr("cy", function(d) { return y(+d[subplot.vpos]); });
       } else if (subplot.marktype == "bar") {
         if (subplot.sideways) {
-          bars.attr("y", function(d) { return y(+d[subplot.vpos]); })
+          marks.attr("y", function(d) { return y(+d[subplot.vpos]); })
             .attr("height", y.rangeBand())
         } 
         else {
-          bars.attr("y", function(d) { return y(+d[subplot.vpos]); })
+          marks.attr("y", function(d) { return y(+d[subplot.vpos]); })
             .attr("height", function(d) { return height - y(d[subplot.vpos]); });
         }
       }
@@ -79,7 +117,7 @@ function render(plot) {
   }
 
   function drawHorizontalAxis(marks, subplot, subplotContainer, width, height) {
-    if (subplot.haxis) {
+    if (subplot.hasHaxis) {
       
       var x = d3.scale.linear()
         .range([0, width]);
@@ -121,11 +159,11 @@ function render(plot) {
       }
       else if (subplot.marktype == "bar") {
         if (subplot.sideways) {
-          bars.attr("x", function(d) { return x(+d[subplot.hpos]); })
+          marks.attr("x", function(d) { return x(+d[subplot.hpos]); })
             .attr("width", function(d) { return width - x(+d[subplot.hpos]); });
         } 
         else {
-          bars.attr("x", function(d) { return x(+d[subplot.hpos]); })
+          marks.attr("x", function(d) { return x(+d[subplot.hpos]); })
             .attr("width", x.rangeBand())
         }
       }
@@ -154,7 +192,7 @@ function render(plot) {
     var marks = subplotContainer.selectAll(subplot.markclass)
       .data(plot.data)
       .enter().append(subplot.marktag)
-      .attr("class", function(d) { return subplot.markclass; })
+      .attr("class", function(d) { return subplot.markclass + " mark"; })
       .attr("id", function(d) { return "mark_" + d.id; })
       .attr("cx", function(d) { return +d[subplot.hpos]; })
       .attr("cy", function(d) { return +d[subplot.vpos]; });
@@ -182,18 +220,6 @@ function render(plot) {
     drawVerticalAxis(marks, subplot, subplotContainer, width, height);
   }
 
-  function setUpOuterContainer() {
-
-    var outer = d3.select("#presentation");
-    outer.attr("width", WIDTH)
-      .attr("height", HEIGHT);
-    outer.append("rect") // FIXME: Remove after debugging
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
-      .attr("fill", "#acb1d3");
-    return outer;
-  }
-
   function setUpInnerSubplots(outerContainer) {
 
     var subplotAreaWidth = Math.floor(WIDTH/plot.numcols);
@@ -215,10 +241,23 @@ function render(plot) {
         })
       .each(function(d) { helpRender(d, $(this).attr("id")) });
   }
+  
+  function setUpOuterContainer() {
+
+    var outer = d3.select("#presentation");
+    outer.attr("width", WIDTH_PLUS)
+      .attr("height", HEIGHT);
+    outer.append("rect") // FIXME: Remove after debugging
+      .attr("width", WIDTH)
+      .attr("height", HEIGHT)
+      .attr("fill", "#acb1d3");
+    return outer;
+  }
+
 
   // Run:
   var outerContainer = setUpOuterContainer();
   setUpInnerSubplots(outerContainer);
-
+  drawColor(outerContainer);
 }
 
