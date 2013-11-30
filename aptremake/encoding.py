@@ -9,13 +9,9 @@ class Encoding(object):
 
 class SinglePosition(Encoding):
 
-    @classmethod # NOTE: I have deviated from the original here by allowing
-    def can_encode(self, relation): # sets to be encoded.
-        # ORIGINAL:
-        #if (isinstance(relation, FunctionalDependency) \
-        #        and relation.determinant.type == Type.nominal):
-        if isinstance(relation, Set) or \
-           (isinstance(relation, FunctionalDependency) \
+    @classmethod 
+    def can_encode(self, relation):
+        if (isinstance(relation, FunctionalDependency) \
                 and relation.determinant.type == Type.nominal):
             return True
         return False
