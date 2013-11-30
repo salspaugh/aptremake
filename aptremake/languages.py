@@ -1,7 +1,7 @@
 
 from encoding import SinglePosition, ApposedPosition, RetinalList, Map, Connection, Miscellaneous
 from data import *
-from composition import Objects, Encodes, Design
+from design import *
 from collections import OrderedDict
 
 
@@ -33,24 +33,20 @@ class HorizontalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        if isinstance(relation, FunctionalDependency):
-            marks = Encodes(Objects.marks, relation.determinant, cls)
-            hpos = Encodes(Objects.hpos, relation, cls)
-            haxis = Encodes(Objects.haxis, relation.dependent, cls)
-            encodings = [marks, hpos, haxis]
-            tasks = OrderedDict()
-            tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
-            tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
-            return Design(encodings, tasks)
-        if isinstance(relation, Set): # TODO: Consider getting rid of this since
-            marks = Encodes(Objects.marks, relation, cls) # it's not in the original
-            hpos = Encodes(Objects.hpos, relation, cls)
-            haxis = Encodes(Objects.haxis, relation, cls)
-            encodings = [marks, hpos, haxis]
-            tasks = OrderedDict()
-            tasks[relation.name] = (relation.type, Task.position)
-            return Design(encodings, tasks)
-            
+        d = Design()
+        s = Subplot()
+        s.marktype = MarkType.point
+        s.markclass = MarkClass.dot
+        s.marktag = MarkTag.circle
+        s.haxis = True
+        s.hpos = None # TODO: FIXME
+        s.ridx = 0
+        s.cidx = 0
+        d.subplots.append(s)
+        d.data = relation.data
+        d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
+        d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
+        return d
 
 class VerticalAxis(SinglePosition):
     
@@ -62,23 +58,20 @@ class VerticalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        if isinstance(relation, FunctionalDependency):
-            marks = Encodes(Objects.marks, relation.determinant, cls)
-            vpos = Encodes(Objects.vpos, relation, cls)
-            vaxis = Encodes(Objects.vaxis, relation.dependent, cls)
-            encodings = [marks, vpos, vaxis]
-            tasks = OrderedDict()
-            tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
-            tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
-            return Design(encodings, tasks)
-        if isinstance(relation, Set): # TODO: Consider getting rid of this since
-            marks = Encodes(Objects.marks, relation, cls) # it's not in the original
-            vpos = Encodes(Objects.vpos, relation, cls)
-            vaxis = Encodes(Objects.vaxis, relation, cls)
-            encodings = [marks, vpos, vaxis]
-            tasks = OrderedDict()
-            tasks[relation.name] = (relation.type, Task.position)
-            return Design(encodings, tasks)
+        d = Design()
+        s = Subplot()
+        s.marktype = MarkType.point
+        s.markclass = MarkClass.dot
+        s.marktag = MarkTag.circle
+        s.vaxis = True
+        s.vpos = None # TODO: FIXME
+        s.ridx = 0
+        s.cidx = 0
+        d.subplots.append(s)
+        d.data = relation.data
+        d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
+        d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
+        return d
 
 
 #class LineChart(ApposedPosition):
@@ -104,20 +97,22 @@ class BarChart(ApposedPosition):
     @classmethod
     def design(cls, relation): # TODO: Hard-code in when it becomes a sideways bar chart.
         if isinstance(relation, FunctionalDependency):
-            marks = Encodes(Objects.marks, relation.determinant, cls) 
-            haxis = Encodes(Objects.haxis, relation.determinant, cls)
-            hpos = Encodes(Objects.hpos, relation, cls)
-            vaxis = Encodes(Objects.vaxis, relation.dependent, cls)
-            vpos = Encodes(Objects.vpos, relation, cls)
-            #height = Encodes(Objects.height, relation, cls)
-            #width = Encodes(Objects.width, None, cls) # unconstrained
-            marktype = Encodes(Objects.marktype, "bar", cls)
-            #encodings = [marks, haxis, hpos, vaxis, vpos, height, width, marktype]
-            encodings = [marks, haxis, hpos, vaxis, vpos, marktype]
-            tasks = OrderedDict()
-            tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
-            tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
-            return Design(encodings, tasks)
+            d = Design()
+            s = Subplot()
+            s.marktype = MarkType.bar
+            s.markclass = MarkClass.bar
+            s.marktag = MarkTag.rect
+            s.vaxis = True
+            s.haxis = True
+            s.vpos = None # TODO: FIXME
+            s.hpos = None
+            s.ridx = 0
+            s.cidx = 0
+            d.subplots.append(s)
+            d.data = relation.data
+            d.tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
+            d.tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
+            return d
 
 #class PlotChart(ApposedPosition):
 #
@@ -149,20 +144,40 @@ class Color(RetinalList):
     @classmethod
     def design(cls, relation):
         if isinstance(relation, FunctionalDependency):
-            marks = Encodes(Objects.marks, relation.determinant, cls)
-            color = Encodes(Objects.color, relation, cls)
-            encodings = [marks, color]
-            tasks = OrderedDict()
-            tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
-            tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
-            return Design(encodings, tasks)
+            d = Design()
+            s = Subplot()
+            s.marktype = MarkType.bar
+            s.markclass = MarkClass.bar
+            s.marktag = MarkTag.rect
+            s.vaxis = True
+            s.haxis = True
+            s.vpos = None # TODO: FIXME
+            s.hpos = None
+            s.ridx = 0
+            s.cidx = 0
+            d.color = None # TODO: FIXME
+            d.subplots.append(s)
+            d.data = relation.data
+            d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
+            d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
+            return d
         if isinstance(relation, Set):
-            marks = Encodes(Objects.marks, relation, cls)
-            color = Encodes(Objects.color, relation, cls)
-            encodings = [marks, color]
-            tasks = OrderedDict()
-            tasks[relation.name] = (relation.type, Task.hue)
-            return Design(encodings, tasks)
+            d = Design()
+            s = Subplot()
+            s.marktype = MarkType.bar
+            s.markclass = MarkClass.bar
+            s.marktag = MarkTag.rect
+            s.vaxis = True
+            s.haxis = True
+            s.vpos = None # TODO: FIXME
+            s.hpos = None
+            s.ridx = 0
+            s.cidx = 0
+            d.color = None # TODO: FIXME
+            d.subplots.append(s)
+            d.tasks[relation.name] = (relation.type, Task.hue)
+            d.data = relation.data
+            return d
 
 
 #class Shape(RetinalList):
