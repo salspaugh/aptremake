@@ -12,6 +12,7 @@ class Relation(object):
     
     def __init__(self, name=""): # FIXME: Make name required
         self.name = name
+        self.data = []
         self.selected = False # FIXME: These attributes are tied to the
         self.importance = -1 # visualization rendering and probably shouldn't be here.
 
@@ -74,4 +75,14 @@ def read_data(specfilename):
             if s["class"] == "FunctionalDependency":
                 data[s["name"]].determinant = data[s["domain"]]
                 data[s["name"]].dependent = data[s["range"]]
+    return data
+
+def load(columns):
+    db = connect(apt.database)
+    statement = " ".join(["SELECT", "%s, "*(len(columns)+1), "FROM ", apt.table])
+    columns = ["APTREMAKEID"] + columns
+    statement = statement % columns
+    cursor = db.execute(statement)
+    data = [dict(zip(columns, tup)) for tup in cursor.fetchall()]
+    db.close()
     return data

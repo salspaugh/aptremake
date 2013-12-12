@@ -33,17 +33,10 @@ class HorizontalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        d = Design()
-        s = Subplot()
-        s.marktype = MarkType.point
-        s.markclass = MarkClass.dot
-        s.marktag = MarkTag.circle
-        s.haxis = True
-        s.hpos = None # TODO: FIXME
-        s.ridx = 0
-        s.cidx = 0
-        d.subplots.append(s)
-        d.data = relation.data
+        subplot = Subplot(Marks["POINTS"])
+        subplot.haxis = True
+        subplot.hpos = relation.dependent.name
+        d = Design(subplot={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
         return d
@@ -58,21 +51,13 @@ class VerticalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        d = Design()
-        s = Subplot()
-        s.marktype = MarkType.point
-        s.markclass = MarkClass.dot
-        s.marktag = MarkTag.circle
-        s.vaxis = True
-        s.vpos = None # TODO: FIXME
-        s.ridx = 0
-        s.cidx = 0
-        d.subplots.append(s)
-        d.data = relation.data
+        subplot = Subplot(Marks["POINTS"])
+        subplot.vaxis = True
+        subplot.vpos = relation.dependent.name
+        d = Design(subplot={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
         return d
-
 
 #class LineChart(ApposedPosition):
 #    
@@ -97,19 +82,12 @@ class BarChart(ApposedPosition):
     @classmethod
     def design(cls, relation): # TODO: Hard-code in when it becomes a sideways bar chart.
         if isinstance(relation, FunctionalDependency):
-            d = Design()
-            s = Subplot()
-            s.marktype = MarkType.bar
-            s.markclass = MarkClass.bar
-            s.marktag = MarkTag.rect
-            s.vaxis = True
-            s.haxis = True
-            s.vpos = None # TODO: FIXME
-            s.hpos = None
-            s.ridx = 0
-            s.cidx = 0
-            d.subplots.append(s)
-            d.data = relation.data
+            subplot = Subplot(Marks["BARS"])
+            subplot.haxis = True
+            subplot.vaxis = True
+            subplot.hpos = relation.determinant.name
+            subplot.vpos = relation.dependent.name
+            d = Design(subplot={(0,0): subplot}, data=relation.data) 
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
             return d
@@ -124,7 +102,6 @@ class BarChart(ApposedPosition):
 
 
 class Color(RetinalList):
-    
     
     task = Task.hue
 
@@ -144,41 +121,18 @@ class Color(RetinalList):
     @classmethod
     def design(cls, relation):
         if isinstance(relation, FunctionalDependency):
-            d = Design()
-            s = Subplot()
-            s.marktype = MarkType.bar
-            s.markclass = MarkClass.bar
-            s.marktag = MarkTag.rect
-            s.vaxis = True
-            s.haxis = True
-            s.vpos = None # TODO: FIXME
-            s.hpos = None
-            s.ridx = 0
-            s.cidx = 0
-            d.color = None # TODO: FIXME
-            d.subplots.append(s)
-            d.data = relation.data
+            subplot = Subplot(Marks["POINTS"])
+            d = Design(subplot={(0,0): subplot}, data=relation.data) 
+            d.color = relation.dependent
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
             return d
         if isinstance(relation, Set):
-            d = Design()
-            s = Subplot()
-            s.marktype = MarkType.bar
-            s.markclass = MarkClass.bar
-            s.marktag = MarkTag.rect
-            s.vaxis = True
-            s.haxis = True
-            s.vpos = None # TODO: FIXME
-            s.hpos = None
-            s.ridx = 0
-            s.cidx = 0
-            d.color = None # TODO: FIXME
-            d.subplots.append(s)
+            subplot = Subplot(Marks["POINTS"])
+            d = Design(subplot={(0,0): subplot}, data=relation.data) 
+            d.color = relation.dependent
             d.tasks[relation.name] = (relation.type, Task.hue)
-            d.data = relation.data
             return d
-
 
 #class Shape(RetinalList):
 #    
