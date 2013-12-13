@@ -47,11 +47,11 @@
             "type": "ORDINAL",
             "domain": "Repair",
             "ordering": {
-                "Great": 1,
-                "Good": 2,
+                "Great": 5,
+                "Good": 4,
                 "OK": 3,
-                "Bad": 4,
-                "Terrible": 5
+                "Bad": 2,
+                "Terrible": 1
             },
             "arity": 1,
             "data": ["Great", "Good", "OK", "Bad", "Terrible"]
