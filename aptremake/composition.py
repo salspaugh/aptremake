@@ -7,7 +7,8 @@ def compose(designs):
     # TODO: Verify that designs is a list of designs.
     print
     for d in designs:
-        print d
+        print d.render()
+        print
     if len(designs) == 0:
         return []
     if len(designs) == 1:
@@ -19,6 +20,8 @@ def compose(designs):
         return compose([design] + designs[2:]) if design else None
 
 def _compose(designa, designb):
+    if no_axes(designa) or no_axes(designb):
+        return merge_subplots(designa, designb)
     haxes_match = horizontal_axes_match(designa, designb)
     vaxes_match = vertical_axes_match(designa, designb)
     if haxes_match and vaxes_match:
@@ -27,6 +30,11 @@ def _compose(designa, designb):
         return concat_subplots_below(designa, designb)
     if vaxes_match:
         return concat_subplots_right(designa, designb)
+
+def no_axes(design):
+    no_haxes = all([not s.haxis for s in design.subplots.itervalues()])
+    no_vaxes = all([not s.vaxis for s in design.subplots.itervalues()])
+    return no_haxes and no_vaxes
 
 def horizontal_axes_match(designa, designb):
     # TODO: Check that not checking if permutations match is ok.
@@ -48,8 +56,10 @@ def merge_subplots(designa, designb):
             designb.color = designa.color
         else:
             designa.color = designb.color
-        for (idx, subplot) in designa.subplots.iteritems():
-            subplot.marks.append(designb.subplots[idx])
+        # TODO: Make multi-mark plots work
+        #for (idx, subplot) in designa.subplots.iteritems():
+        #    subplot.marks.append(designb.subplots[idx])
+        designa.data = list(set(designa.data + designb.data))
         return designa
 
 def concat_subplots_below(designa, designb):
@@ -60,8 +70,9 @@ def concat_subplots_below(designa, designb):
             designa.color = designb.color
         for (idx, subplot) in designb.subplots.iteritems():
             (r,c) = idx
-            subplot.rowidx += designa.nrows
+            subplot.ridx += designa.nrows
             designa.subplots[(r+designa.nrows, c)] = subplot
+        designa.nrows += designb.nrows
         designa.data = list(set(designa.data + designb.data))
         return designa
     
@@ -73,8 +84,9 @@ def concat_subplots_right(designa, designb):
             designa.color = designb.color
         for (idx, subplot) in designb.subplots.iteritems():
             (r,c) = idx
-            subplot.colidx += designa.ncols
+            subplot.cidx += designa.ncols
             designa.subplots[(r, c+designa.ncols)] = subplot
+        designa.ncols += designb.ncols
         designa.data = list(set(designa.data + designb.data))
         return designa
     

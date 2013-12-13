@@ -26,6 +26,7 @@ class Set(Relation):
         self.arity = None
         self.type = None
         self.domain = None
+        self.ordering = None # TODO: FIXME
         self.determinant = self
         self.dependent = self # TODO: Verify that this isn't some awful bastard thing to do.
         Relation.__init__(self, name=name)
@@ -73,6 +74,7 @@ def read_data(specfilename):
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
             d.domain = s.get("domain", None)
+            d.ordering = s.get("ordering", None)
             d.tuples = s["data"]
             d.arity = s["arity"]
             data[s["name"]] = d

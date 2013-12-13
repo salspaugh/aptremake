@@ -35,7 +35,10 @@ class HorizontalAxis(SinglePosition):
     def design(cls, relation):
         subplot = Subplot(Marks["POINTS"])
         subplot.haxis = True
-        subplot.hpos = relation.dependent.name
+        subplot.hpos = subplot.hlabel = relation.dependent.name
+        subplot.hordering = relation.dependent.ordering
+        subplot.hpos_nominal = relation.dependent.type == Type.nominal
+        subplot.hpos_ordinal = relation.dependent.type == Type.ordinal
         d = Design(subplots={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
@@ -53,7 +56,10 @@ class VerticalAxis(SinglePosition):
     def design(cls, relation):
         subplot = Subplot(Marks["POINTS"])
         subplot.vaxis = True
-        subplot.vpos = relation.dependent.name
+        subplot.vpos = subplot.vlabel = relation.dependent.name
+        subplot.vordering = relation.dependent.ordering
+        subplot.vpos_nominal = relation.dependent.type == Type.nominal
+        subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
         d = Design(subplots={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
@@ -85,8 +91,14 @@ class BarChart(ApposedPosition):
             subplot = Subplot(Marks["BARS"])
             subplot.haxis = True
             subplot.vaxis = True
-            subplot.hpos = relation.determinant.name
-            subplot.vpos = relation.dependent.name
+            subplot.hpos = subplot.hlabel = relation.determinant.name
+            subplot.hordering = relation.determinant.ordering
+            subplot.hpos_nominal = relation.determinant.type == Type.nominal
+            subplot.hpos_ordinal = relation.determinant.type == Type.ordinal
+            subplot.vpos = subplot.vlabel = relation.dependent.name
+            subplot.vordering = relation.dependent.ordering
+            subplot.vpos_nominal = relation.dependent.type == Type.nominal
+            subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
             d = Design(subplots={(0,0): subplot}, data=relation.data) 
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
@@ -123,14 +135,18 @@ class Color(RetinalList):
         if isinstance(relation, FunctionalDependency):
             subplot = Subplot(Marks["POINTS"])
             d = Design(subplots={(0,0): subplot}, data=relation.data) 
-            d.color = relation.dependent
+            d.color = relation.dependent.name
+            d.color_ordinal = relation.dependent.type == Type.ordinal
+            d.cordering = relation.dependent.ordering
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
             return d
         if isinstance(relation, Set):
             subplot = Subplot(Marks["POINTS"])
             d = Design(subplots={(0,0): subplot}, data=relation.data) 
-            d.color = relation.dependent
+            d.color = relation.name
+            d.color_ordinal = relation.type == Type.ordinal
+            d.cordering = relation.ordering
             d.tasks[relation.name] = (relation.type, Task.hue)
             return d
 

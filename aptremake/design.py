@@ -6,8 +6,8 @@ class Mark(object):
 
     class MarkType(object):
 
-        point = "POINT"
-        bar = "BAR"
+        point = "point"
+        bar = "bar"
 
     class MarkClass(object):
         
@@ -38,7 +38,15 @@ class Subplot(object):
         self.vaxis = False
         self.marks = marks
         self.hpos = None
+        self.hpos_nominal = False
+        self.hpos_ordinal = False
+        self.hordering = None
+        self.hlabel = ""
         self.vpos = None
+        self.vpos_nominal = False
+        self.vpos_ordinal = False
+        self.vordering = None
+        self.vlabel = ""
     
     def render(self):
         return {
@@ -50,7 +58,15 @@ class Subplot(object):
             "markClass": self.marks.markclass,
             "markTag": self.marks.marktag,
             "hpos": self.hpos,
-            "vpos": self.vpos
+            "hpos_nominal": self.hpos_nominal,
+            "hpos_ordinal": self.hpos_ordinal,
+            "hordering": self.hordering,
+            "hlabel": self.hlabel,
+            "vpos": self.vpos,
+            "vpos_nominal": self.vpos_nominal,
+            "vpos_ordinal": self.vpos_ordinal,
+            "vordering": self.vordering,
+            "vlabel": self.vlabel
         }
 
 class Design(object):
@@ -59,11 +75,13 @@ class Design(object):
         self.subplots = subplots
         self.nrows = max([s.ridx+1 for s in subplots.itervalues()])
         self.ncols = max([s.cidx+1 for s in subplots.itervalues()])
-        self.haxes = dict([(s.ridx, s.haxis) for s in subplots.itervalues()])
-        self.vaxes = dict([(s.cidx, s.vaxis) for s in subplots.itervalues()])
+        self.haxes = dict([(s.ridx, s.hpos) for s in subplots.itervalues()])
+        self.vaxes = dict([(s.cidx, s.vpos) for s in subplots.itervalues()])
         self.data = data
         self.tasks = OrderedDict()
         self.color = None
+        self.color_ordinal = False
+        self.cordering = None
 
     def render(self):
         return {
@@ -71,6 +89,8 @@ class Design(object):
             "ncols": self.ncols,
             "hasColor": bool(self.color),
             "color": self.color,
+            "color_ordinal": self.color_ordinal,
+            "cordering": self.cordering,
             "subplots": [s.render() for s in self.subplots.itervalues()],
             "data": load(self.data)
         }
