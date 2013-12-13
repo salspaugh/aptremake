@@ -14,7 +14,6 @@
             "name": "Nation",
             "class": "Set",
             "type": "NOMINAL",
-            "domain": "Nation",
             "arity": 1,
             "data": ["USA", "Japan", "Germany", "France", "Sweden"]
         },
@@ -47,6 +46,13 @@
             "class": "Set",
             "type": "ORDINAL",
             "domain": "Repair",
+            "ordering": {
+                "Great": 1,
+                "Good": 2,
+                "OK": 3,
+                "Bad": 4,
+                "Terrible": 5
+            },
             "arity": 1,
             "data": ["Great", "Good", "OK", "Bad", "Terrible"]
         },
