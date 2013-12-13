@@ -3,7 +3,7 @@ function render(plot) {
   console.log("Rendering:", plot);
    
   // Important constants:
-  var MARGIN = {TOP: 20, RIGHT: 10, BOTTOM: 70, LEFT: 50};
+  var MARGIN = {TOP: 20, RIGHT: 10, BOTTOM: 70, LEFT: 60};
   var WIDTH = 650; 
   var WIDTH_PLUS = 750;
   var HEIGHT = 650; 
@@ -26,8 +26,6 @@ function render(plot) {
       d3.selectAll(".mark")
         .style("stroke", "black")
         .style("fill", function(d) { return color(d[plot.color]); });
-
-      console.log(color.domain());
 
       var legend = outerContainer.selectAll(".legend")
         .data(color.domain())
@@ -55,15 +53,18 @@ function render(plot) {
       var y = d3.scale.linear()
         .range([height, 0]);
       
-      y.domain(d3.extent(plot.data, function(d) { return +d[subplot.vpos]; })).nice();
+      // TODO: Figure out why this isn't working like it was before, or if it was:
+      //y.domain(d3.extent(plot.data, function(d) { return d[subplot.vpos]; })).nice();
+      v = _.map(plot.data, function (d) { return d[subplot.vpos]; });
+      y.domain([_.min([0, _.min(v)]), _.max(v)]).nice();
       
       if (subplot.vpos_ordinal || subplot.vpos_nominal) {
-        var vdomain = _.uniq(_.map(plot.data, function(d) { return +d[subplot.vpos]; } ));
+        var vdomain = _.uniq(_.map(plot.data, function(d) { return d[subplot.vpos]; } ));
         if (subplot.vpos_ordinal) {
           vdomain = _.sortBy(vdomain, function(d) { return subplot.vordering[d]; });
         }
         var y = d3.scale.ordinal()
-          .rangepoints([height, 0], 1)
+          .rangePoints([height, 0], 1)
           .domain(vdomain);
       }
 
@@ -83,15 +84,15 @@ function render(plot) {
         .style("text-anchor", "end")
         .text(subplot.vlabel)
       
-      if (subplot.marktype == "point") {
-        marks.attr("cy", function(d) { return y(+d[subplot.vpos]); });
-      } else if (subplot.marktype == "bar") {
+      if (subplot.markType == "point") {
+        marks.attr("cy", function(d) { return y(d[subplot.vpos]); });
+      } else if (subplot.markType == "bar") {
         if (subplot.sideways) {
-          marks.attr("y", function(d) { return y(+d[subplot.vpos]); })
+          marks.attr("y", function(d) { return y(d[subplot.vpos]); })
             .attr("height", y.rangeBand())
         } 
         else {
-          marks.attr("y", function(d) { return y(+d[subplot.vpos]); })
+          marks.attr("y", function(d) { return y(d[subplot.vpos]); })
             .attr("height", function(d) { return height - y(d[subplot.vpos]); });
         }
       }
@@ -108,9 +109,9 @@ function render(plot) {
         .attr("class", "y axis")
         .call(yAxis);
       // TODO: Figure out how to make this extra axis invisible.
-      if (subplot.marktype == "point") {
+      if (subplot.markType == "point") {
         marks.attr("cy", function(d) { return y(Math.random()); });
-      } else if (subplot.marktype == "bar") {
+      } else if (subplot.markType == "bar") {
         // TODO: Check: This shouldn't happen.
       }
     }
@@ -121,10 +122,13 @@ function render(plot) {
       
       var x = d3.scale.linear()
         .range([0, width]);
-      x.domain(d3.extent(plot.data, function(d) { return +d[subplot.hpos]; })).nice();
+      
+      //x.domain(d3.extent(plot.data, function(d) { return d[subplot.hpos]; })).nice();
+      h = _.map(plot.data, function (d) { return d[subplot.hpos]; });
+      x.domain([_.min([0, _.min(h)]), _.max(h)]).nice();
       
       if (subplot.hpos_ordinal || subplot.hpos_nominal) {
-        var hdomain = _.uniq(_.map(plot.data, function(d) { return +d[subplot.hpos] } ));
+        var hdomain = _.uniq(_.map(plot.data, function(d) { return d[subplot.hpos] } ));
         if (subplot.hpos_ordinal) {
           hdomain = _.sortBy(hdomain, function(d) { return subplot.hordering[d] });
         }
@@ -153,17 +157,17 @@ function render(plot) {
         .attr("y", -6)
         .style("text-anchor", "end")
         .text(subplot.hlabel);
-      
-      if (subplot.marktype == "point") {
-        marks.attr("cx", function(d) { return x(+d[subplot.hpos]); });
+     
+      if (subplot.markType == "point") {
+        marks.attr("cx", function(d) { return x(d[subplot.hpos]); });
       }
-      else if (subplot.marktype == "bar") {
+      else if (subplot.markType == "bar") {
         if (subplot.sideways) {
-          marks.attr("x", function(d) { return x(+d[subplot.hpos]); })
-            .attr("width", function(d) { return width - x(+d[subplot.hpos]); });
+          marks.attr("x", function(d) { return x(d[subplot.hpos]); })
+            .attr("width", function(d) { return width - x(d[subplot.hpos]); });
         } 
-        else {
-          marks.attr("x", function(d) { return x(+d[subplot.hpos]); })
+        else { // TODO: FIXME: rangeBand only works if x is ordinal, insert safety check
+          marks.attr("x", function(d) { return x(d[subplot.hpos]); })
             .attr("width", x.rangeBand())
         }
       }
@@ -180,23 +184,23 @@ function render(plot) {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-      if (subplot.marktype == "point") {
+      if (subplot.markType == "point") {
         marks.attr("cx", function(d) { return x(Math.random()); });
-      } else if (subplot.marktype == "bar") {
+      } else if (subplot.markType == "bar") {
         // TODO: Check: This shouldn't happen.
       }
     }
   }
 
   function drawMarks(subplot, subplotContainer) {
-    var marks = subplotContainer.selectAll(subplot.markclass)
+    var marks = subplotContainer.selectAll(subplot.markClass)
       .data(plot.data)
-      .enter().append(subplot.marktag)
-      .attr("class", function(d) { return subplot.markclass + " mark"; })
-      .attr("id", function(d) { return "mark_" + d.id; })
-      .attr("cx", function(d) { return +d[subplot.hpos]; })
-      .attr("cy", function(d) { return +d[subplot.vpos]; });
-    if (subplot.marktype == "point") {
+      .enter().append(subplot.markTag)
+      .attr("class", function(d) { return subplot.markClass + " mark"; })
+      .attr("id", function(d) { return "mark_" + d.APTREMAKEID; })
+      .attr("cx", function(d) { return d[subplot.hpos]; })
+      .attr("cy", function(d) { return d[subplot.vpos]; });
+    if (subplot.markType == "point") {
       marks.attr("r", 5);
     }
     return marks;
@@ -209,10 +213,10 @@ function render(plot) {
     var width = +subplotContainer.attr("width") - MARGIN.LEFT - MARGIN.RIGHT;
     var height = +subplotContainer.attr("height") - MARGIN.TOP - MARGIN.BOTTOM;
 
-    subplotContainer.append("rect") // FIXME: Remove after debugging
-      .attr("width", width)
-      .attr("height", height)
-      .attr("fill", "pink");
+    //subplotContainer.append("rect") // FIXME: Remove after debugging
+    //  .attr("width", width)
+    //  .attr("height", height)
+    //  .attr("fill", "pink");
 
     console.log("Subplot", subplot);
     marks = drawMarks(subplot, subplotContainer);
@@ -222,8 +226,8 @@ function render(plot) {
 
   function setUpInnerSubplots(outerContainer) {
 
-    var subplotAreaWidth = Math.floor(WIDTH/plot.numcols);
-    var subplotAreaHeight = Math.floor(HEIGHT/plot.numrows);
+    var subplotAreaWidth = Math.floor(WIDTH/plot.ncols);
+    var subplotAreaHeight = Math.floor(HEIGHT/plot.nrows);
 
     var inners = outerContainer.selectAll("svg")
       .data(plot.subplots)
@@ -232,11 +236,11 @@ function render(plot) {
     inners.attr("width", subplotAreaWidth)
       .attr("height", subplotAreaHeight)
       .attr("id", function(d) {
-        return "subplotArea_" + d.rowidx + "_" + d.colidx;
+        return "subplotArea_" + d.ridx + "_" + d.cidx;
         })
       .attr("transform", function(d) { 
-        var left = d.colidx*subplotAreaWidth + MARGIN.LEFT;
-        var top = d.rowidx*subplotAreaHeight + MARGIN.TOP;
+        var left = d.cidx*subplotAreaWidth + MARGIN.LEFT;
+        var top = d.ridx*subplotAreaHeight + MARGIN.TOP;
         return "translate(" + left + "," + top + ")"; 
         })
       .each(function(d) { helpRender(d, $(this).attr("id")) });
@@ -247,10 +251,10 @@ function render(plot) {
     var outer = d3.select("#presentation");
     outer.attr("width", WIDTH_PLUS)
       .attr("height", HEIGHT);
-    outer.append("rect") // FIXME: Remove after debugging
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
-      .attr("fill", "#acb1d3");
+    //outer.append("rect") // FIXME: Remove after debugging
+    //  .attr("width", WIDTH)
+    //  .attr("height", HEIGHT)
+    //  .attr("fill", "#acb1d3");
     return outer;
   }
 
