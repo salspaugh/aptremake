@@ -1,5 +1,5 @@
 
-from data import read_data, store
+from data import read_data
 from plantree import RootNode, PresentationTreeNode
 
 def generate_presentation(data):
@@ -13,9 +13,7 @@ def generate_presentation(data):
         stack = node.children + stack
 
 def test():
-    database, table, data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec")
-    store["database"] = database
-    store["table"] = table
+    data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec")
     #apt_input = [data["Car mileage for 1979"], data["Car price for 1979"], data["Car nationality for 1979"]]
     apt_input = [data["Car mileage for 1979"]]
     selection_data = [s.name for s in apt_input]

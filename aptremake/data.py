@@ -67,8 +67,8 @@ def read_data(specfilename):
     data = {}
     with open(specfilename) as specfile:
         spec = json.load(specfile)
-        database = spec["database"]
-        table = spec["table"]
+        store["database"] = spec["database"]
+        store["table"] = spec["table"]
         for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
@@ -82,7 +82,7 @@ def read_data(specfilename):
                 d.determinant = data[s["domain"]]
                 d.dependent = data[s["range"]]
                 d.data = [d.determinant.name, d.dependent.name]
-    return database, table, data
+    return data
 
 def load(columns):
     db = connect(store["database"])
