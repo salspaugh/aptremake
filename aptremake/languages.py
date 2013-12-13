@@ -36,7 +36,7 @@ class HorizontalAxis(SinglePosition):
         subplot = Subplot(Marks["POINTS"])
         subplot.haxis = True
         subplot.hpos = relation.dependent.name
-        d = Design(subplot={(0,0): subplot}, data=relation.data) 
+        d = Design(subplots={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
         return d
@@ -54,7 +54,7 @@ class VerticalAxis(SinglePosition):
         subplot = Subplot(Marks["POINTS"])
         subplot.vaxis = True
         subplot.vpos = relation.dependent.name
-        d = Design(subplot={(0,0): subplot}, data=relation.data) 
+        d = Design(subplots={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
         return d
@@ -87,7 +87,7 @@ class BarChart(ApposedPosition):
             subplot.vaxis = True
             subplot.hpos = relation.determinant.name
             subplot.vpos = relation.dependent.name
-            d = Design(subplot={(0,0): subplot}, data=relation.data) 
+            d = Design(subplots={(0,0): subplot}, data=relation.data) 
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
             return d
@@ -122,14 +122,14 @@ class Color(RetinalList):
     def design(cls, relation):
         if isinstance(relation, FunctionalDependency):
             subplot = Subplot(Marks["POINTS"])
-            d = Design(subplot={(0,0): subplot}, data=relation.data) 
+            d = Design(subplots={(0,0): subplot}, data=relation.data) 
             d.color = relation.dependent
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
             return d
         if isinstance(relation, Set):
             subplot = Subplot(Marks["POINTS"])
-            d = Design(subplot={(0,0): subplot}, data=relation.data) 
+            d = Design(subplots={(0,0): subplot}, data=relation.data) 
             d.color = relation.dependent
             d.tasks[relation.name] = (relation.type, Task.hue)
             return d

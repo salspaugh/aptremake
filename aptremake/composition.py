@@ -33,25 +33,31 @@ def horizontal_axes_match(designa, designb):
     ncols = designa.ncols
     if designb.ncols != ncols:
         return False
-    return all([designa.haxes[i] == designb.haxes[i] for i in range(ncols)]):
+    return all([designa.haxes[i] == designb.haxes[i] for i in range(ncols)])
 
 def vertical_axes_match(designa, designb):
     # TODO: Check that not checking if permutations match is ok.
     nrows = designa.nrows
     if designb.nrows != nrows:
         return False
-    return all([designa.vaxes[i] == designb.vaxes[i] for i in range(nrows)]):
+    return all([designa.vaxes[i] == designb.vaxes[i] for i in range(nrows)])
 
 def merge_subplots(designa, designb):
     if not (designa.color and designb.color and designa.color != designb.color):
-        (designb.color = designa.color) if designa.color else (designa.color = designb.color)
+        if designa.color:
+            designb.color = designa.color
+        else:
+            designa.color = designb.color
         for (idx, subplot) in designa.subplots.iteritems():
             subplot.marks.append(designb.subplots[idx])
         return designa
 
 def concat_subplots_below(designa, designb):
     if not (designa.color and designb.color and designa.color != designb.color):
-        (designb.color = designa.color) if designa.color else (designa.color = designb.color)
+        if designa.color:
+            designb.color = designa.color
+        else:
+            designa.color = designb.color
         for (idx, subplot) in designb.subplots.iteritems():
             (r,c) = idx
             subplot.rowidx += designa.nrows
@@ -61,7 +67,10 @@ def concat_subplots_below(designa, designb):
     
 def concat_subplots_right(designa, designb):
     if not (designa.color and designb.color and designa.color != designb.color):
-        (designb.color = designa.color) if designa.color else (designa.color = designb.color)
+        if designa.color:
+            designb.color = designa.color
+        else:
+            designa.color = designb.color
         for (idx, subplot) in designb.subplots.iteritems():
             (r,c) = idx
             subplot.colidx += designa.ncols

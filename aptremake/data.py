@@ -1,5 +1,8 @@
 
 import json
+from sqlite3 import connect
+
+store = {}
 
 class Type(object):
 
@@ -64,24 +67,28 @@ def read_data(specfilename):
     data = {}
     with open(specfilename) as specfile:
         spec = json.load(specfile)
-        for s in spec:
+        database = spec["database"]
+        table = spec["table"]
+        for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
             d.domain = s.get("domain", None)
             d.tuples = s["data"]
             d.arity = s["arity"]
             data[s["name"]] = d
-        for s in spec:
+        for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":
-                data[s["name"]].determinant = data[s["domain"]]
-                data[s["name"]].dependent = data[s["range"]]
-    return data
+                d = data[s["name"]]
+                d.determinant = data[s["domain"]]
+                d.dependent = data[s["range"]]
+                d.data = [d.determinant.name, d.dependent.name]
+    return database, table, data
 
 def load(columns):
-    db = connect(apt.database)
-    statement = " ".join(["SELECT", "%s, "*(len(columns)+1), "FROM ", apt.table])
+    db = connect(store["database"])
+    statement = " ".join(["SELECT", ", ".join(["%s"]*(len(columns)+1)), "FROM", store["table"]])
     columns = ["APTREMAKEID"] + columns
-    statement = statement % columns
+    statement = statement % tuple(columns)
     cursor = db.execute(statement)
     data = [dict(zip(columns, tup)) for tup in cursor.fetchall()]
     db.close()
