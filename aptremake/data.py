@@ -1,5 +1,8 @@
 
 import json
+from sqlite3 import connect
+
+store = {}
 
 class Type(object):
 
@@ -12,6 +15,7 @@ class Relation(object):
     
     def __init__(self, name=""): # FIXME: Make name required
         self.name = name
+        self.data = []
         self.selected = False # FIXME: These attributes are tied to the
         self.importance = -1 # visualization rendering and probably shouldn't be here.
 
@@ -22,6 +26,7 @@ class Set(Relation):
         self.arity = None
         self.type = None
         self.domain = None
+        self.ordering = None # TODO: FIXME
         self.determinant = self
         self.dependent = self # TODO: Verify that this isn't some awful bastard thing to do.
         Relation.__init__(self, name=name)
@@ -63,15 +68,30 @@ def read_data(specfilename):
     data = {}
     with open(specfilename) as specfile:
         spec = json.load(specfile)
-        for s in spec:
+        store["database"] = spec["database"]
+        store["table"] = spec["table"]
+        for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
             d.domain = s.get("domain", None)
+            d.ordering = s.get("ordering", None)
             d.tuples = s["data"]
             d.arity = s["arity"]
             data[s["name"]] = d
-        for s in spec:
+        for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":
-                data[s["name"]].determinant = data[s["domain"]]
-                data[s["name"]].dependent = data[s["range"]]
+                d = data[s["name"]]
+                d.determinant = data[s["domain"]]
+                d.dependent = data[s["range"]]
+                d.data = [d.determinant.name, d.dependent.name]
+    return data
+
+def load(columns):
+    db = connect(store["database"])
+    statement = " ".join(["SELECT", ", ".join(["%s"]*(len(columns)+1)), "FROM", store["table"]])
+    columns = ["APTREMAKEID"] + columns
+    statement = statement % tuple(columns)
+    cursor = db.execute(statement)
+    data = [dict(zip(columns, tup)) for tup in cursor.fetchall()]
+    db.close()
     return data

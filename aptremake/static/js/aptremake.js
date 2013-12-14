@@ -1,232 +1,267 @@
-function render(design) {
-
-    console.log("Design being rendered:", design)
+function render(plot) {
   
-    // Constants:
-    var NUM_TICKS = 5;
-    var POINT_SIZE = 5;
-    var MARGIN = {TOP: 40, RIGHT: 50, BOTTOM: 90, LEFT: 70}, // Is this necessary?
-        WIDTH = 400 - MARGIN.LEFT - MARGIN.RIGHT,  // Such things appear at the top
-        WIDTH_PLUS = WIDTH + 500;
-        HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM; // of most d3 examples.
-    var INVISIBLE_AXIS_HEIGHT = HEIGHT/4;
-    var INVISIBLE_AXIS_WIDTH = WIDTH/4;
+  console.log("Rendering:", plot);
+   
+  // Important constants:
+  var MARGIN = {TOP: 20, RIGHT: 10, BOTTOM: 70, LEFT: 60};
+  var WIDTH = 650; 
+  var WIDTH_PLUS = 750;
+  var HEIGHT = 650; 
+  var NUM_TICKS = 5;
+
+  function drawColor(outerContainer) {
+    if (plot.hasColor) {
+      var color = d3.scale.category10();
+
+      if (plot.color_ordinal) {
+        var colordomain = _.uniq(_.map(plot.data, 
+                    function(d) { return d.color } ));
+        colordomain = _.sortBy(colordomain, function(d) { return plot.cordering[d] });
+
+        var color = d3.scale.ordinal()
+          .domain(colordomain)
+          .range(colorbrewer.RdBu[colordomain.length]);
+      }
       
-    // Set up the presentation space:
-    svg = d3.select("#presentation")
-        .attr("width", WIDTH_PLUS)
-        .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-       .append("g")
-        .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
+      d3.selectAll(".mark")
+        .style("stroke", "black")
+        .style("fill", function(d) { return color(d[plot.color]); });
 
-    if (design.marktype == "dot") {
-        dots = svg.selectAll(".dot") // TODO: Figure out if I should put "var" here.
-            .data(design.data)
-            .enter().append("circle")
-            .style("fill", "#BBB")
-            .style("stroke", "black")
-            .attr("r", POINT_SIZE)
-            .attr("mark", function(d) { return d.mark; });
+      var legend = outerContainer.selectAll(".legend")
+        .data(color.domain())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(0," + (i*20 + MARGIN.TOP) + ")"; });
+      legend.append("rect")
+        .attr("x", WIDTH + 80)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color)
+        .style("stroke", "black");
+      legend.append("text")
+        .attr("x", WIDTH + 74)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return d; });
     }
-    else if (design.marktype == "bar") {
-        bars = svg.selectAll(".bar")
-            .data(design.data)
-            .enter().append("rect")
-            .attr("class", "bar")
-            .style("fill", "#BBB")
-            .style("stroke", "black");
-    }
+  }
 
-    if (design.haxis) {
-    
-        var x = d3.scale.linear()
-            .range([0, WIDTH]);
-        x.domain(d3.extent(design.data, function(d) { return d.hpos; })).nice();
-        
-        if (design.hpos_ordinal || design.hpos_nominal) {
-
-            var hdomain = _.uniq(_.map(design.data, 
-                                function(d) { return d.hpos } ));
-            if (design.hpos_ordinal) {
-                hdomain = _.sortBy(hdomain, function(d) { return design.hordering[d] });
-            }
-            var x = d3.scale.ordinal()
-                //.rangePoints([0, WIDTH], 1)
-                .rangeRoundBands([0, WIDTH], .1)
-                .domain(hdomain);
+  function drawVerticalAxis(marks, subplot, subplotContainer, width, height) {
+    if (subplot.hasVaxis) {
+      
+      var y = d3.scale.linear()
+        .range([height, 0]);
+      
+      // TODO: Figure out why this isn't working like it was before, or if it was:
+      //y.domain(d3.extent(plot.data, function(d) { return d[subplot.vpos]; })).nice();
+      v = _.map(plot.data, function (d) { return d[subplot.vpos]; });
+      y.domain([_.min([0, _.min(v)]), _.max(v)]).nice();
+      
+      if (subplot.vpos_ordinal || subplot.vpos_nominal) {
+        var vdomain = _.uniq(_.map(plot.data, function(d) { return d[subplot.vpos]; } ));
+        if (subplot.vpos_ordinal) {
+          vdomain = _.sortBy(vdomain, function(d) { return subplot.vordering[d]; });
         }
+        var y = d3.scale.ordinal()
+          .rangePoints([height, 0], 1)
+          .domain(vdomain);
+      }
 
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
-            .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
-     
-        xAxisCall = svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + HEIGHT + ")")
-            .call(xAxis);
-        xAxisCall.selectAll("text")  
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", function(d) { return "rotate(-90)" });
-        xAxisCall.append("text")
-            .attr("class", "label")
-            .attr("x", WIDTH)
-            .attr("y", -6)
-            .style("text-anchor", "end")
-            .text(design.hlabel);
-        
-        if (design.marktype == "dot") {
-            dots.attr("cx", function(d) { return x(d.hpos); });
-        }
-        else if (design.marktype == "bar") {
-            if (design.sideways) {
-                bars.attr("x", function(d) { return x(d.hpos); })
-                    .attr("width", function(d) { return WIDTH - x(d.hpos); });
-            } 
-            else {
-                bars.attr("x", function(d) { return x(d.hpos); })
-                    .attr("width", x.rangeBand())
-            }
-        }
-    } else {
-        
-        var x = d3.scale.linear()
-            .range([0, INVISIBLE_AXIS_WIDTH])
-            .domain([0, 1]);
-        
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
-            .ticks(0); // No ticks.
-     
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + HEIGHT + ")")
-            .call(xAxis);
-
-        if (design.marktype == "dot") {
-            dots.attr("cx", function(d) { return x(Math.random()); });
-        } else if (design.marktype == "bar") {
-            // TODO: Check: This shouldn't happen.
-        }
-    }
-    
-    if (design.vaxis) {
-        
-        var y = d3.scale.linear()
-            .range([HEIGHT, 0]);
-        
-        y.domain(d3.extent(design.data, function(d) { return d.vpos; })).nice();
-        
-        if (design.vpos_ordinal || design.vpos_nominal) {
-
-            var vdomain = _.uniq(_.map(design.data, 
-                                function(d) { return d.vpos } ));
-            if (design.vpos_ordinal) {
-                vdomain = _.sortBy(vdomain, function(d) { return design.vordering[d] });
-            }
-            var y = d3.scale.ordinal()
-                .rangePoints([HEIGHT, 0], 1)
-                .domain(vdomain);
-        }
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left")
-            .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
        
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-           .append("text")
-            .attr("class", "label")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text(design.vlabel)
-        
-        if (design.marktype == "dot") {
-            dots.attr("cy", function(d) { return y(d.vpos); });
-        } else if (design.marktype == "bar") {
-            if (design.sideways) {
-                bars.attr("y", function(d) { return y(d.vpos); })
-                    .attr("height", y.rangeBand())
-            } 
-            else {
-                bars.attr("y", function(d) { return y(d.vpos); })
-                    .attr("height", function(d) { return HEIGHT - y(d.vpos); });
-            }
+      subplotContainer.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(subplot.vlabel)
+      
+      if (subplot.markType == "point") {
+        marks.attr("cy", function(d) { return y(d[subplot.vpos]); });
+      } else if (subplot.markType == "bar") {
+        if (subplot.sideways) {
+          marks.attr("y", function(d) { return y(d[subplot.vpos]); })
+            .attr("height", y.rangeBand())
+        } 
+        else {
+          marks.attr("y", function(d) { return y(d[subplot.vpos]); })
+            .attr("height", function(d) { return height - y(d[subplot.vpos]); });
         }
+      }
     } else {
-        
-        var y = d3.scale.linear()
-            .range([HEIGHT, HEIGHT-INVISIBLE_AXIS_HEIGHT])
-            .domain([0, 1]);
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left")
-            .ticks(0); // No ticks.
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-
-        // TODO: Figure out how to make this extra axis invisible.
-        //d3.selectAll(".axis path")
-        //    .style("stroke", "white");
-        if (design.marktype == "dot") {
-            dots.attr("cy", function(d) { return y(Math.random()); });
-        } else if (design.marktype == "bar") {
-            // TODO: Check: This shouldn't happen.
-        }
-    
+      var invisible_axis_height = height/4;
+      var y = d3.scale.linear()
+        .range([height, height-invisible_axis_height])
+        .domain([0, 1]);
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(0); // No ticks.
+      subplotContainer.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+      // TODO: Figure out how to make this extra axis invisible.
+      if (subplot.markType == "point") {
+        marks.attr("cy", function(d) { return y(Math.random()); });
+      } else if (subplot.markType == "bar") {
+        // TODO: Check: This shouldn't happen.
+      }
     }
-    
-    if (design.color) {
+  }
 
-        var color = d3.scale.category10();
-
-        if (design.color_ordinal) {
-            var colordomain = _.uniq(_.map(design.data, 
-                                    function(d) { return d.color } ));
-            colordomain = _.sortBy(colordomain, function(d) { return design.colorordering[d] });
-
-            var color = d3.scale.ordinal()
-                .domain(colordomain)
-                .range(colorbrewer.RdBu[colordomain.length]);
+  function drawHorizontalAxis(marks, subplot, subplotContainer, width, height) {
+    if (subplot.hasHaxis) {
+      
+      var x = d3.scale.linear()
+        .range([0, width]);
+      
+      //x.domain(d3.extent(plot.data, function(d) { return d[subplot.hpos]; })).nice();
+      h = _.map(plot.data, function (d) { return d[subplot.hpos]; });
+      x.domain([_.min([0, _.min(h)]), _.max(h)]).nice();
+      
+      if (subplot.hpos_ordinal || subplot.hpos_nominal) {
+        var hdomain = _.uniq(_.map(plot.data, function(d) { return d[subplot.hpos] } ));
+        if (subplot.hpos_ordinal) {
+          hdomain = _.sortBy(hdomain, function(d) { return subplot.hordering[d] });
         }
-        if (design.marktype == "dot") {
-            dots.style("stroke", "black")
-                .style("fill", function(d) { return color(d.color); });
-        } else if (design.marktype == "bar") {
-            bars.style("stroke", "black")
-                .style("fill", function(d) { return color(d.color); });
+        var x = d3.scale.ordinal()
+          .rangeRoundBands([0, width], .1)
+          .domain(hdomain);
+      }
+
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(NUM_TICKS); 
+      
+      var xAxisCall = subplotContainer.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+      xAxisCall.selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) { return "rotate(-90)" });
+      xAxisCall.append("text")
+        .attr("class", "label")
+        .attr("x", width)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text(subplot.hlabel);
+     
+      if (subplot.markType == "point") {
+        marks.attr("cx", function(d) { return x(d[subplot.hpos]); });
+      }
+      else if (subplot.markType == "bar") {
+        if (subplot.sideways) {
+          marks.attr("x", function(d) { return x(d[subplot.hpos]); })
+            .attr("width", function(d) { return width - x(d[subplot.hpos]); });
+        } 
+        else { // TODO: FIXME: rangeBand only works if x is ordinal, insert safety check
+          marks.attr("x", function(d) { return x(d[subplot.hpos]); })
+            .attr("width", x.rangeBand())
         }
-
-        var legend = svg.selectAll(".legend")
-            .data(color.domain())
-            .enter().append("g")
-            .attr("class", "legend")
-            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-        legend.append("rect")
-            .attr("x", WIDTH + 90) // TODO: Make distance from plot dependent on data.
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", color)
-            .style("stroke", "black");
-
-        legend.append("text")
-            .attr("x", WIDTH + 84)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "end")
-            .text(function(d) { return d; });
-
+      }
+    } else {
+      var invisible_axis_width = width/4;
+      var x = d3.scale.linear()
+        .range([0, invisible_axis_width])
+        .domain([0, 1]);
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(0); // No ticks.
+      subplotContainer.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+      if (subplot.markType == "point") {
+        marks.attr("cx", function(d) { return x(Math.random()); });
+      } else if (subplot.markType == "bar") {
+        // TODO: Check: This shouldn't happen.
+      }
     }
+  }
 
+  function drawMarks(subplot, subplotContainer) {
+    var marks = subplotContainer.selectAll(subplot.markClass)
+      .data(plot.data)
+      .enter().append(subplot.markTag)
+      .attr("class", function(d) { return subplot.markClass + " mark"; })
+      .attr("id", function(d) { return "mark_" + d.APTREMAKEID; })
+      .attr("cx", function(d) { return d[subplot.hpos]; })
+      .attr("cy", function(d) { return d[subplot.vpos]; });
+    if (subplot.markType == "point") {
+      marks.attr("r", 5);
+    }
+    return marks;
+  }
+
+  function helpRender(subplot, subplotContainerID) {
+
+    var subplotContainer = d3.select("#" + subplotContainerID);
+
+    var width = +subplotContainer.attr("width") - MARGIN.LEFT - MARGIN.RIGHT;
+    var height = +subplotContainer.attr("height") - MARGIN.TOP - MARGIN.BOTTOM;
+
+    //subplotContainer.append("rect") // FIXME: Remove after debugging
+    //  .attr("width", width)
+    //  .attr("height", height)
+    //  .attr("fill", "pink");
+
+    console.log("Subplot", subplot);
+    marks = drawMarks(subplot, subplotContainer);
+    drawHorizontalAxis(marks, subplot, subplotContainer, width, height);
+    drawVerticalAxis(marks, subplot, subplotContainer, width, height);
+  }
+
+  function setUpInnerSubplots(outerContainer) {
+
+    var subplotAreaWidth = Math.floor(WIDTH/plot.ncols);
+    var subplotAreaHeight = Math.floor(HEIGHT/plot.nrows);
+
+    var inners = outerContainer.selectAll("svg")
+      .data(plot.subplots)
+      .enter().append("svg").append("g");
+
+    inners.attr("width", subplotAreaWidth)
+      .attr("height", subplotAreaHeight)
+      .attr("id", function(d) {
+        return "subplotArea_" + d.ridx + "_" + d.cidx;
+        })
+      .attr("transform", function(d) { 
+        var left = d.cidx*subplotAreaWidth + MARGIN.LEFT;
+        var top = d.ridx*subplotAreaHeight + MARGIN.TOP;
+        return "translate(" + left + "," + top + ")"; 
+        })
+      .each(function(d) { helpRender(d, $(this).attr("id")) });
+  }
+  
+  function setUpOuterContainer() {
+
+    var outer = d3.select("#presentation");
+    outer.attr("width", WIDTH_PLUS)
+      .attr("height", HEIGHT);
+    //outer.append("rect") // FIXME: Remove after debugging
+    //  .attr("width", WIDTH)
+    //  .attr("height", HEIGHT)
+    //  .attr("fill", "#acb1d3");
+    return outer;
+  }
+
+
+  // Run:
+  var outerContainer = setUpOuterContainer();
+  setUpInnerSubplots(outerContainer);
+  drawColor(outerContainer);
 }
+

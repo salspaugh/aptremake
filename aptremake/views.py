@@ -9,7 +9,6 @@ from data import read_data
 import json
 
 CARS = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec"
-    
 
 @app.route("/", methods=["GET", "POST"])
 def design():
