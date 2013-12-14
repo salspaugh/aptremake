@@ -1,5 +1,5 @@
 
-==Introduction==
+## Introduction
 
 This is a partial re-implementation of Jock Mackinlay's APT based on the 1986 Transactions on Graphics paper.
 
@@ -11,17 +11,15 @@ Currently the only "languages" supported are:
 * BarChart
 * Color
 
-==How to run aptremake==
+## How to run aptremake
 
 On the command line, type:
 
     python runserver.py
 
-In your browser, navigate to:
+In your browser, navigate to [127.0.0.1:5000](127.0.0.1:5000)
 
-    127.0.0.1:5000
-
-==Dependencies==
+## Dependencies
 
 * [Flask](http://flask.pocoo.org/ "Flask")
 * [SQLite](https://www.sqlite.org/ "SQLite")
