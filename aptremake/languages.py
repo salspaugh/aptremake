@@ -42,6 +42,7 @@ class HorizontalAxis(SinglePosition):
         d = Design(subplots={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
+        #d.tasks[None] = (None, Task.position)
         return d
 
 class VerticalAxis(SinglePosition):
@@ -63,6 +64,7 @@ class VerticalAxis(SinglePosition):
         d = Design(subplots={(0,0): subplot}, data=relation.data) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
+        #d.tasks[None] = (None, Task.position)
         return d
 
 #class LineChart(ApposedPosition):
@@ -133,8 +135,7 @@ class Color(RetinalList):
     @classmethod
     def design(cls, relation):
         if isinstance(relation, FunctionalDependency):
-            subplot = Subplot(Marks["POINTS"])
-            d = Design(subplots={(0,0): subplot}, data=relation.data) 
+            d = Design(data=relation.data) 
             d.color = relation.dependent.name
             d.color_ordinal = relation.dependent.type == Type.ordinal
             d.cordering = relation.dependent.ordering
@@ -142,8 +143,7 @@ class Color(RetinalList):
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
             return d
         if isinstance(relation, Set):
-            subplot = Subplot(Marks["POINTS"])
-            d = Design(subplots={(0,0): subplot}, data=relation.data) 
+            d = Design(data=relation.data) 
             d.color = relation.name
             d.color_ordinal = relation.type == Type.ordinal
             d.cordering = relation.ordering

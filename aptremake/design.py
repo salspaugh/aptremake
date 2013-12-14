@@ -47,7 +47,7 @@ class Subplot(object):
         self.vpos_ordinal = False
         self.vordering = None
         self.vlabel = ""
-    
+
     def render(self):
         return {
             "ridx": self.ridx,
@@ -73,8 +73,11 @@ class Design(object):
 
     def __init__(self, subplots={}, data=[]):
         self.subplots = subplots
-        self.nrows = max([s.ridx+1 for s in subplots.itervalues()])
-        self.ncols = max([s.cidx+1 for s in subplots.itervalues()])
+        self.nrows = 0
+        self.ncols = 0
+        if len(subplots) > 0:
+            self.nrows = max([s.ridx+1 for s in subplots.itervalues()])
+            self.ncols = max([s.cidx+1 for s in subplots.itervalues()])
         self.haxes = dict([(s.ridx, s.hpos) for s in subplots.itervalues()])
         self.vaxes = dict([(s.cidx, s.vpos) for s in subplots.itervalues()])
         self.data = data

@@ -1,11 +1,11 @@
 
-from collections import defaultdict, OrderedDict
+from copy import deepcopy
 from data import *
-
 
 def compose(designs):
     # TODO: Verify that designs is a list of designs.
-    print
+    print "--------------------------------------------------------------------"
+    print "COMPOSING:"
     for d in designs:
         print d.render()
         print
@@ -26,18 +26,24 @@ def _compose(designa, designb):
     vaxes_match = vertical_axes_match(designa, designb)
     if haxes_match and vaxes_match:
         return merge_subplots(designa, designb)
-    if haxes_match:
+    if haxes_match and not no_vaxes(designa) and not no_vaxes(designb):
         return concat_subplots_below(designa, designb)
-    if vaxes_match:
+    if vaxes_match and not no_haxes(designa) and not no_haxes(designb):
         return concat_subplots_right(designa, designb)
 
+def no_haxes(design):
+    return all([not s.haxis for s in design.subplots.itervalues()])
+
+def no_vaxes(design):
+    return all([not s.vaxis for s in design.subplots.itervalues()])
+
 def no_axes(design):
-    no_haxes = all([not s.haxis for s in design.subplots.itervalues()])
-    no_vaxes = all([not s.vaxis for s in design.subplots.itervalues()])
-    return no_haxes and no_vaxes
+    return no_haxes(design) and no_vaxes(design)
 
 def horizontal_axes_match(designa, designb):
     # TODO: Check that not checking if permutations match is ok.
+    if no_haxes(designa) and no_haxes(designb):
+        return False
     ncols = designa.ncols
     if designb.ncols != ncols:
         return False
@@ -45,6 +51,8 @@ def horizontal_axes_match(designa, designb):
 
 def vertical_axes_match(designa, designb):
     # TODO: Check that not checking if permutations match is ok.
+    if no_vaxes(designa) and no_vaxes(designb):
+        return False
     nrows = designa.nrows
     if designb.nrows != nrows:
         return False
@@ -52,43 +60,39 @@ def vertical_axes_match(designa, designb):
 
 def merge_subplots(designa, designb):
     if not (designa.color and designb.color and designa.color != designb.color):
-        if designa.color:
-            designb.color = designa.color
-        else:
-            designa.color = designb.color
+        new_design= deepcopy(designa) if len(designa.subplots) > 0 else deepcopy(designb)
+        new_design.color = designa.color if designa.color else designb.color
         # TODO: Make multi-mark plots work
         #for (idx, subplot) in designa.subplots.iteritems():
         #    subplot.marks.append(designb.subplots[idx])
-        designa.data = list(set(designa.data + designb.data))
-        return designa
+        new_design.data = list(set(designa.data + designb.data))
+        return new_design
 
 def concat_subplots_below(designa, designb):
     if not (designa.color and designb.color and designa.color != designb.color):
-        if designa.color:
-            designb.color = designa.color
-        else:
-            designa.color = designb.color
+        new_design= deepcopy(designa)
+        new_design.color = designa.color if designa.color else designb.color
         for (idx, subplot) in designb.subplots.iteritems():
+            new_subplot = deepcopy(subplot)
             (r,c) = idx
-            subplot.ridx += designa.nrows
-            designa.subplots[(r+designa.nrows, c)] = subplot
-        designa.nrows += designb.nrows
-        designa.data = list(set(designa.data + designb.data))
-        return designa
+            new_subplot.ridx += new_design.nrows
+            new_design.subplots[(r+new_design.nrows, c)] = new_subplot
+        new_design.nrows += designb.nrows
+        new_design.data = list(set(designa.data + designb.data))
+        return new_design
     
 def concat_subplots_right(designa, designb):
     if not (designa.color and designb.color and designa.color != designb.color):
-        if designa.color:
-            designb.color = designa.color
-        else:
-            designa.color = designb.color
+        new_design= deepcopy(designa)
+        new_design.color = designa.color if designa.color else designb.color
         for (idx, subplot) in designb.subplots.iteritems():
+            new_subplot = deepcopy(subplot)
             (r,c) = idx
-            subplot.cidx += designa.ncols
-            designa.subplots[(r, c+designa.ncols)] = subplot
-        designa.ncols += designb.ncols
-        designa.data = list(set(designa.data + designb.data))
-        return designa
+            new_subplot.cidx += new_design.ncols
+            new_design.subplots[(r, c+new_design.ncols)] = new_subplot
+        new_design.ncols += designb.ncols
+        new_design.data = list(set(designa.data + designb.data))
+        return new_design
     
 
 

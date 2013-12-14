@@ -3,7 +3,6 @@ from data import Relation
 from languages import _languages
 from ranking import rank
 from composition import compose
-from render import render
 
 INDENT = '    '
 
@@ -118,10 +117,18 @@ class SelectionTreeNode(PlanTreeNode):
         PlanTreeNode.__init__(self)
     
     def generate_children(self):
+        print "================================================================"
+        print "TRYING:"
+        print
+        for s in self.selections:
+            print s.render()
+            print
         design = compose(self.selections)
         if design:
             c = CompositionTreeNode(design)
             self.add_child(c)
+        else:
+            print "FAILED"
 
     def __repr__(self):
         return " ".join(["SELECTION:"] + [str(s) for s in self.selections])
@@ -133,7 +140,7 @@ class CompositionTreeNode(PlanTreeNode):
         PlanTreeNode.__init__(self)
 
     def generate_children(self):
-        presentation = render(self.design)
+        presentation = self.design.render()
         p = PresentationTreeNode(presentation)
         self.add_child(p)
 
