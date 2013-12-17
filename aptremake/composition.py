@@ -77,7 +77,7 @@ def axes_compatible(designa, designb):
 
 def merge_compatible_axes(designa, designb):
     print "Merging compatible axes"
-    new_design = Design()
+    new_design = deepcopy(designa)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     new_design.haxes = (deepcopy(designa.haxes) if len(designb.haxes) == 0 else deepcopy(designb.haxes))
     new_design.vaxes = (deepcopy(designa.vaxes) if len(designb.vaxes) == 0 else deepcopy(designb.vaxes))
