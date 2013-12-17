@@ -77,7 +77,7 @@ class PartitionTreeNode(PlanTreeNode):
         self.partition = partition
         PlanTreeNode.__init__(self) 
 
-    def combine(self, sets):
+    def combine(self, sets): # TODO: Replace with itertools version
         if len(sets) == 0:
             return sets
         if len(sets) == 1:

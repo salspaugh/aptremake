@@ -33,7 +33,7 @@ class HorizontalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        subplot = Subplot(Marks["POINTS"])
+        subplot = Subplot(Marks["POINTS"](relation.determinant.name))
         subplot.haxis = True
         subplot.hpos = subplot.hlabel = relation.dependent.name
         subplot.hordering = relation.dependent.ordering
@@ -55,7 +55,7 @@ class VerticalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        subplot = Subplot(Marks["POINTS"])
+        subplot = Subplot(Marks["POINTS"](relation.determinant.name))
         subplot.vaxis = True
         subplot.vpos = subplot.vlabel = relation.dependent.name
         subplot.vordering = relation.dependent.ordering
@@ -90,7 +90,7 @@ class BarChart(ApposedPosition):
     @classmethod
     def design(cls, relation): # TODO: Hard-code in when it becomes a sideways bar chart.
         if isinstance(relation, FunctionalDependency):
-            subplot = Subplot(Marks["BARS"])
+            subplot = Subplot(Marks["BARS"](relation.determinant.name))
             subplot.haxis = True
             subplot.vaxis = True
             subplot.hpos = subplot.hlabel = relation.determinant.name
@@ -309,7 +309,7 @@ _languages = [
     HorizontalAxis,
     VerticalAxis,
 #    LineChart,
-    BarChart,
+#    BarChart,
 #    PlotChart,
     Color,
 #    Shape,

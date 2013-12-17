@@ -19,14 +19,20 @@ class Mark(object):
         circle = "circle"
         rect = "rect"
 
-    def __init__(self, marktype, markclass, marktag):
+    def __init__(self, marktype, markclass, marktag, data):
         self.marktype = marktype
         self.markclass = markclass
         self.marktag = marktag
+        self.data = data
+
+def bind_marks(marktype, markclass, marktag):
+    def mark(binding):
+        return Mark(marktype, markclass, marktag, binding)
+    return mark
 
 Marks = {
-    "POINTS": Mark(Mark.MarkType.point, Mark.MarkClass.dot, Mark.MarkTag.circle), 
-    "BARS": Mark(Mark.MarkType.bar, Mark.MarkClass.bar, Mark.MarkTag.rect)
+    "POINTS": bind_marks(Mark.MarkType.point, Mark.MarkClass.dot, Mark.MarkTag.circle), 
+    "BARS": bind_marks(Mark.MarkType.bar, Mark.MarkClass.bar, Mark.MarkTag.rect)
 }
 
 class Subplot(object):
@@ -35,18 +41,34 @@ class Subplot(object):
         self.ridx = 0
         self.cidx = 0
         self.haxis = False
-        self.vaxis = False
         self.marks = marks
         self.hpos = None
         self.hpos_nominal = False
         self.hpos_ordinal = False
         self.hordering = None
         self.hlabel = ""
+        self.vaxis = False
         self.vpos = None
         self.vpos_nominal = False
         self.vpos_ordinal = False
         self.vordering = None
         self.vlabel = ""
+
+    def copy_haxis(self, design):
+        self.haxis = design.haxis
+        self.hpos = design.hpos
+        self.hpos_nominal = design.hpos_nominal
+        self.hpos_ordinal = design.hpos_ordinal
+        self.hordering = design.hordering
+        self.hlabel = design.hlabel
+
+    def copy_vaxis(self, design):
+        self.vaxis = design.vaxis
+        self.vpos = design.vpos
+        self.vpos_nominal = design.vpos_nominal
+        self.vpos_ordinal = design.vpos_ordinal
+        self.vordering = design.vordering
+        self.vlabel = design.vlabel
 
     def render(self):
         return {
@@ -85,6 +107,11 @@ class Design(object):
         self.color = None
         self.color_ordinal = False
         self.cordering = None
+
+    def copy_color(self, design):
+        self.color = design.color
+        self.color_ordinal = design.color_ordinal
+        self.cordering = design.cordering
 
     def render(self):
         return {
