@@ -121,7 +121,7 @@ class SelectionTreeNode(PlanTreeNode):
         print "TRYING:"
         print
         for s in self.selections:
-            print s.render()
+            print s
             print
         design = compose(self.selections)
         if design:

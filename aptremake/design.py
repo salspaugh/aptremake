@@ -1,6 +1,7 @@
 
 from collections import OrderedDict
 from data import load
+from copy import deepcopy
 
 class Mark(object):
 
@@ -54,21 +55,25 @@ class Subplot(object):
         self.vordering = None
         self.vlabel = ""
 
-    def copy_haxis(self, design):
-        self.haxis = design.haxis
-        self.hpos = design.hpos
-        self.hpos_nominal = design.hpos_nominal
-        self.hpos_ordinal = design.hpos_ordinal
-        self.hordering = design.hordering
-        self.hlabel = design.hlabel
+    def __repr__(self):
+        s = "HAXIS: " + str(self.hpos) + "; VAXIS: " + str(self.vpos)
+        return s
 
+    def copy_haxis(self, design):
+        self.haxis = deepcopy(design.haxis)
+        self.hpos = deepcopy(design.hpos)
+        self.hpos_nominal = deepcopy(design.hpos_nominal)
+        self.hpos_ordinal = deepcopy(design.hpos_ordinal)
+        self.hordering = deepcopy(design.hordering)
+        self.hlabel = deepcopy(design.hlabel)
+    
     def copy_vaxis(self, design):
-        self.vaxis = design.vaxis
-        self.vpos = design.vpos
-        self.vpos_nominal = design.vpos_nominal
-        self.vpos_ordinal = design.vpos_ordinal
-        self.vordering = design.vordering
-        self.vlabel = design.vlabel
+        self.vaxis = deepcopy(design.vaxis)
+        self.vpos = deepcopy(design.vpos)
+        self.vpos_nominal = deepcopy(design.vpos_nominal)
+        self.vpos_ordinal = deepcopy(design.vpos_ordinal)
+        self.vordering = deepcopy(design.vordering)
+        self.vlabel = deepcopy(design.vlabel)
 
     def render(self):
         return {
@@ -93,15 +98,18 @@ class Subplot(object):
 
 class Design(object):
 
-    def __init__(self, subplots={}, data=[]):
-        self.subplots = subplots
+    def __init__(self, subplots=None, data=None):
+        self.subplots = subplots if subplots else {}
         self.nrows = 0
         self.ncols = 0
-        if len(subplots) > 0:
-            self.nrows = max([s.ridx+1 for s in subplots.itervalues()])
-            self.ncols = max([s.cidx+1 for s in subplots.itervalues()])
-        self.haxes = dict([(s.ridx, s.hpos) for s in subplots.itervalues()])
-        self.vaxes = dict([(s.cidx, s.vpos) for s in subplots.itervalues()])
+        if subplots and len(self.subplots) > 0:
+            self.nrows = max([s.ridx+1 for s in self.subplots.itervalues()])
+            self.ncols = max([s.cidx+1 for s in self.subplots.itervalues()])
+        self.haxes = {}
+        self.vaxes = {}
+        if subplots:
+            self.haxes = dict([(s.ridx, s.hpos) for s in self.subplots.itervalues()])
+            self.vaxes = dict([(s.cidx, s.vpos) for s in self.subplots.itervalues()])
         self.data = data
         self.tasks = OrderedDict()
         self.color = None
@@ -109,9 +117,9 @@ class Design(object):
         self.cordering = None
 
     def copy_color(self, design):
-        self.color = design.color
-        self.color_ordinal = design.color_ordinal
-        self.cordering = design.cordering
+        self.color = deepcopy(design.color)
+        self.color_ordinal = deepcopy(design.color_ordinal)
+        self.cordering = deepcopy(design.cordering)
 
     def render(self):
         return {
@@ -125,3 +133,11 @@ class Design(object):
             "data": load(self.data)
         }
 
+    def __repr__(self): # TODO: Fix these to be consistent with Python convention.
+        s = "COLOR: " + str(self.color)
+        s += "\nHAXES: " + str(self.haxes)
+        s += "\nVAXES: " + str(self.vaxes)
+        s += "\nSUBPLOTS: " 
+        for (idx, subplot) in self.subplots.iteritems():
+            s += "\n\t" + str(idx) + ": " + str(subplot)
+        return s

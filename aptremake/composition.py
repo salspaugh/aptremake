@@ -8,7 +8,7 @@ def compose(designs):
     print "--------------------------------------------------------------------"
     print "COMPOSING:"
     for d in designs:
-        print d.render()
+        print d
         print
     if len(designs) == 0:
         return []
@@ -20,8 +20,7 @@ def compose(designs):
         design = _compose(designs[0], designs[1])
         return compose([design] + designs[2:]) if design else None
 
-def _compose(designa, designb):
-    # TODO: Document pre-conditions for each function.
+def _compose(designa, designb): # TODO: Document pre-conditions for functions
     if retinal_encodings_conflict(designa, designb):
         return None
     if not has_axes(designa) or not has_axes(designb):
@@ -50,8 +49,7 @@ def has_axes(design):
     return has_haxes(design) or has_vaxes(design)
 
 def horizontal_axes_match(designa, designb):
-    # TODO: Check that not checking if permutations match is ok.
-    if not has_haxes(designa) and not has_haxes(designb):
+    if not has_haxes(designa) or not has_haxes(designb):
         return False
     ncols = designa.ncols
     if designb.ncols != ncols:
@@ -59,8 +57,7 @@ def horizontal_axes_match(designa, designb):
     return all([designa.haxes[i] == designb.haxes[i] for i in range(ncols)])
 
 def vertical_axes_match(designa, designb):
-    # TODO: Check that not checking if permutations match is ok.
-    if not has_vaxes(designa) and not has_vaxes(designb):
+    if not has_vaxes(designa) or not has_vaxes(designb):
         return False
     nrows = designa.nrows
     if designb.nrows != nrows:
@@ -79,19 +76,22 @@ def axes_compatible(designa, designb):
     return True
 
 def merge_compatible_axes(designa, designb):
+    print "Merging compatible axes"
     new_design = Design()
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
-    new_design.haxes = designa.haxes if len(designb.haxes) == 0 else designb.haxes
-    new_design.vaxes = designa.vaxes if len(designb.vaxes) == 0 else designb.vaxes
+    new_design.haxes = (deepcopy(designa.haxes) if len(designb.haxes) == 0 else deepcopy(designb.haxes))
+    new_design.vaxes = (deepcopy(designa.vaxes) if len(designb.vaxes) == 0 else deepcopy(designb.vaxes))
     new_design.data = list(set(designa.data + designb.data))
     for (idx, subplota) in designa.subplots.iteritems():
         subplotb = designb.subplots[idx]
-        new_subplot = deepcopy(subplota) if subplota.haxis else deepcopy(subplotb)
+        new_subplot = Subplot(deepcopy(subplota.marks))
+        new_subplot.copy_haxis(subplota) if subplota.haxis else new_subplot.copy_haxis(subplotb) 
         new_subplot.copy_vaxis(subplota) if subplota.vaxis else new_subplot.copy_vaxis(subplotb) 
         new_design.subplots[idx] = new_subplot
     return new_design
 
 def merge_matching_axes(designa, designb):
+    print "Merging matching axes"
     new_design = deepcopy(designa) if len(designa.subplots) > 0 else deepcopy(designb)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     # TODO: Make multi-mark plots work
@@ -101,6 +101,7 @@ def merge_matching_axes(designa, designb):
     return new_design
 
 def concat_subplots_below(designa, designb):
+    print "Concatenating subplots below"
     new_design = deepcopy(designa)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     for (idx, subplot) in designb.subplots.iteritems():
@@ -113,6 +114,7 @@ def concat_subplots_below(designa, designb):
     return new_design
     
 def concat_subplots_right(designa, designb):
+    print "Concatenating subplots right"
     new_design = deepcopy(designa)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     for (idx, subplot) in designb.subplots.iteritems():
