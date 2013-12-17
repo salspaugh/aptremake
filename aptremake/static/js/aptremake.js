@@ -15,8 +15,10 @@ function render(plot) {
 
       if (plot.color_ordinal) {
         var colordomain = _.uniq(_.map(plot.data, 
-                    function(d) { return d.color } ));
+                    function(d) { return d[plot.color] } ));
         colordomain = _.sortBy(colordomain, function(d) { return plot.cordering[d] });
+
+        console.log(colordomain);
 
         var color = d3.scale.ordinal()
           .domain(colordomain)
