@@ -8,6 +8,8 @@ function render(plot) {
   var WIDTH_PLUS = 750;
   var HEIGHT = 650; 
   var NUM_TICKS = 5;
+  var LEFTPADDING = -1*(MARGIN.LEFT-10);
+  var BOTTOMPADDING = -1*(MARGIN.BOTTOM-10);
 
   function drawColor(outerContainer) {
     if (plot.hasColor) {
@@ -49,7 +51,7 @@ function render(plot) {
     }
   }
 
-  function drawVerticalAxis(marks, subplot, subplotContainer, width, height) {
+  function drawVerticalAxis(marks, subplot, subplotContainer, width, height, leftmost) {
     if (subplot.hasVaxis) {
       
       var y = d3.scale.linear()
@@ -77,14 +79,14 @@ function render(plot) {
        
       subplotContainer.append("g")
         .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("class", "label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(subplot.vlabel)
+        .call(yAxis);
+
+      if (leftmost) {
+        subplotContainer.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + LEFTPADDING + ", " + (height/2) + ") rotate(-90)")
+          .text(subplot.vlabel);
+      }     
       
       if (subplot.markType == "point") {
         marks.attr("cy", function(d) { return y(d[subplot.vpos]); });
@@ -119,7 +121,7 @@ function render(plot) {
     }
   }
 
-  function drawHorizontalAxis(marks, subplot, subplotContainer, width, height) {
+  function drawHorizontalAxis(marks, subplot, subplotContainer, width, height, bottommost) {
     if (subplot.hasHaxis) {
       
       var x = d3.scale.linear()
@@ -153,13 +155,14 @@ function render(plot) {
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
         .attr("transform", function(d) { return "rotate(-90)" });
-      xAxisCall.append("text")
-        .attr("class", "label")
-        .attr("x", width)
-        .attr("y", -6)
-        .style("text-anchor", "end")
-        .text(subplot.hlabel);
-     
+      
+      if (bottommost) {
+        subplotContainer.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + (width/2) + ", " + (height - BOTTOMPADDING) + ")")
+          .text(subplot.hlabel);
+      }
+      
       if (subplot.markType == "point") {
         marks.attr("cx", function(d) { return x(d[subplot.hpos]); });
       }
@@ -208,7 +211,7 @@ function render(plot) {
     return marks;
   }
 
-  function helpRender(subplot, subplotContainerID) {
+  function helpRender(subplot, subplotContainerID, leftmost, bottommost) {
 
     var subplotContainer = d3.select("#" + subplotContainerID);
 
@@ -222,8 +225,8 @@ function render(plot) {
 
     console.log("Subplot", subplot);
     marks = drawMarks(subplot, subplotContainer);
-    drawHorizontalAxis(marks, subplot, subplotContainer, width, height);
-    drawVerticalAxis(marks, subplot, subplotContainer, width, height);
+    drawHorizontalAxis(marks, subplot, subplotContainer, width, height, bottommost);
+    drawVerticalAxis(marks, subplot, subplotContainer, width, height, leftmost);
   }
 
   function setUpInnerSubplots(outerContainer) {
@@ -238,14 +241,18 @@ function render(plot) {
     inners.attr("width", subplotAreaWidth)
       .attr("height", subplotAreaHeight)
       .attr("id", function(d) {
-        return "subplotArea_" + d.ridx + "_" + d.cidx;
+          return "subplotArea_" + d.ridx + "_" + d.cidx;
         })
       .attr("transform", function(d) { 
-        var left = d.cidx*subplotAreaWidth + MARGIN.LEFT;
-        var top = d.ridx*subplotAreaHeight + MARGIN.TOP;
-        return "translate(" + left + "," + top + ")"; 
+          var left = d.cidx*subplotAreaWidth + MARGIN.LEFT;
+          var top = d.ridx*subplotAreaHeight + MARGIN.TOP;
+          return "translate(" + left + "," + top + ")"; 
         })
-      .each(function(d) { helpRender(d, $(this).attr("id")) });
+      .each(function(d) { 
+          var leftmost = (d.cidx == 0);
+          var bottommost = ((d.ridx+1) == plot.nrows);
+          helpRender(d, $(this).attr("id"), leftmost, bottommost); 
+        });
   }
   
   function setUpOuterContainer() {
@@ -259,7 +266,6 @@ function render(plot) {
     //  .attr("fill", "#acb1d3");
     return outer;
   }
-
 
   // Run:
   var outerContainer = setUpOuterContainer();
