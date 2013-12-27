@@ -8,7 +8,7 @@ def generate_presentation(data):
     while len(stack) > 0:
         node = stack.pop(0)
         if isinstance(node, PresentationTreeNode):
-            return node.presentation
+            yield node.presentation
         node.generate_children()
         stack = node.children + stack
 
