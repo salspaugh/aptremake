@@ -49,8 +49,8 @@ class RootNode(PlanTreeNode):
         Input:
         * data: a list of Relation objects
         """
-        if not isinstance(data, list):
-            raise AttributeError("Data argument must be a list.")
+        if not hasattr(data, "__iter__"):
+            raise AttributeError("Data argument must be iterable.")
         if not all([isinstance(d, Relation) for d in data]):
             raise AttributeError("Data argument list must only contain Relation objects.")
         self.data = data
