@@ -1,9 +1,9 @@
 
-from data import read_data
+from metadata import read_metadata
 from plantree import RootNode, PresentationTreeNode
 
-def generate_presentation(data):
-    plan = RootNode(data)
+def generate_presentation(database, metadata, query):
+    plan = RootNode(database, metadata, query)
     stack = [plan]
     while len(stack) > 0:
         node = stack.pop(0)
@@ -12,20 +12,20 @@ def generate_presentation(data):
         node.generate_children()
         stack = node.children + stack
 
-def test():
-    data = read_data("/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec")
-    #apt_input = [data["Car mileage for 1979"], data["Car price for 1979"], data["Car nationality for 1979"]]
-    #apt_input = [data["Car mileage for 1979"], data["Repair record for 1979"]]
-    #apt_input = [data["Car weight for 1979"], data["Car mileage for 1979"], data["Car nationality for 1979"]]
-    #apt_input = [data["Car nationality for 1979"], data["Car mileage for 1979"]]
-    #apt_input = [data["Car weight for 1979"], data["Car mileage for 1979"]]
-    #apt_input = [data["Car weight for 1979"], data["Car nationality for 1979"], data["Repair record for 1979"]]
-    apt_input = [data["Repair record for 1979"], data["Car nationality for 1979"], data["Car weight for 1979"]]
-    selection_data = [s.name for s in apt_input]
-    selection_data = zip(selection_data, range(1, len(selection_data)+1))
-    selection_data = [{"name": s, "importance": i} for (s, i) in selection_data]
-    return generate_presentation(apt_input), selection_data
+def test(): # TODO: FIXME
+    metadata = read_metadata("/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec")
+    #apt_input = [metadata["Car mileage for 1979"], metadata["Car price for 1979"], metadata["Car nationality for 1979"]]
+    #apt_input = [metadata["Car mileage for 1979"], metadata["Repair record for 1979"]]
+    #apt_input = [metadata["Car weight for 1979"], metadata["Car mileage for 1979"], metadata["Car nationality for 1979"]]
+    #apt_input = [metadata["Car nationality for 1979"], metadata["Car mileage for 1979"]]
+    #apt_input = [metadata["Car weight for 1979"], metadata["Car mileage for 1979"]]
+    #apt_input = [metadata["Car weight for 1979"], metadata["Car nationality for 1979"], metadata["Repair record for 1979"]]
+    apt_input = [metadata["Repair record for 1979"], metadata["Car nationality for 1979"], metadata["Car weight for 1979"]]
+    selection_metadata = [s.name for s in apt_input]
+    selection_metadata = zip(selection_metadata, range(1, len(selection_metadata)+1))
+    selection_metadata = [{"name": s, "importance": i} for (s, i) in selection_metadata]
+    return generate_presentation(apt_input), selection_metadata
 
 if __name__ == "__main__":
-   presentation, selection_data = test()
+   presentation, selection_metadata = test()
    print presentation

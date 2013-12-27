@@ -53,9 +53,9 @@ none = {
 }
 
 ranking_lists = {
-    "QUANTITATIVE" : quantitative,
-    "ORDINAL" : ordinal, 
-    "NOMINAL" : nominal,
+    "quantitative" : quantitative,
+    "ordinal" : ordinal, 
+    "nominal" : nominal,
     None: none
 }
 

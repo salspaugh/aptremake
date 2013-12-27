@@ -1,5 +1,5 @@
 
-from data import Relation
+from metadata import Relation
 from languages import _languages
 from ranking import rank
 from composition import compose
@@ -44,16 +44,14 @@ class PlanTreeNode(object):
 
 class RootNode(PlanTreeNode):
 
-    def __init__(self, data):
-        """
-        Input:
-        * data: a list of Relation objects
-        """
-        if not hasattr(data, "__iter__"):
-            raise AttributeError("Data argument must be iterable.")
-        if not all([isinstance(d, Relation) for d in data]):
-            raise AttributeError("Data argument list must only contain Relation objects.")
-        self.data = data
+    def __init__(self, database, metadata, query):
+        self.database = database
+        self.query = query
+        if not hasattr(metadata, "__iter__"):
+            raise AttributeError("Metadata argument must be iterable.")
+        if not all([isinstance(d, Relation) for d in metadata]):
+            raise AttributeError("Metadata argument list must only contain Relation objects.")
+        self.metadata = metadata
         PlanTreeNode.__init__(self)
 
     def generate_children(self):
@@ -65,16 +63,18 @@ class RootNode(PlanTreeNode):
         according to the paper, it is possible for relations to be partitioned.
         We leave the implementation of that to future work.
         """
-        p = PartitionTreeNode(self.data)
+        p = PartitionTreeNode(self.database, self.metadata, self.query)
         self.add_child(p)
 
     def __repr__(self):
-        return " ".join(["DATA:", str(self.data)])
+        return " ".join(["METADATA:", str(self.metadata)])
 
 class PartitionTreeNode(PlanTreeNode):
     
-    def __init__(self, partition):
+    def __init__(self, database, partition, query):
+        self.database = database
         self.partition = partition
+        self.query = query
         PlanTreeNode.__init__(self) 
 
     def combine(self, sets): # TODO: Replace with itertools version
@@ -103,8 +103,7 @@ class PartitionTreeNode(PlanTreeNode):
             designs.append(self.get_designs(part))
         for selections in self.combine(designs):
             selections = list(self.flatten(selections))
-            s = SelectionTreeNode()
-            s.selections = selections
+            s = SelectionTreeNode(self.database, selections, self.query)
             self.add_child(s)
 
     def __repr__(self):
@@ -112,8 +111,10 @@ class PartitionTreeNode(PlanTreeNode):
 
 class SelectionTreeNode(PlanTreeNode):
 
-    def __init__(self):
-        self.selections = None
+    def __init__(self, database, selections, query):
+        self.database = database
+        self.selections = selections
+        self.query = query
         PlanTreeNode.__init__(self)
     
     def generate_children(self):
@@ -125,7 +126,7 @@ class SelectionTreeNode(PlanTreeNode):
             print
         design = compose(self.selections)
         if design:
-            c = CompositionTreeNode(design)
+            c = CompositionTreeNode(self.database, design, self.query)
             self.add_child(c)
         else:
             print "FAILED"
@@ -135,12 +136,14 @@ class SelectionTreeNode(PlanTreeNode):
 
 class CompositionTreeNode(PlanTreeNode):
 
-    def __init__(self, design):
+    def __init__(self, database, design, query):
+        self.database = database
         self.design = design
+        self.query = query
         PlanTreeNode.__init__(self)
 
     def generate_children(self):
-        presentation = self.design.render()
+        presentation = self.design.render(database, query)
         p = PresentationTreeNode(presentation)
         self.add_child(p)
 

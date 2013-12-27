@@ -1,6 +1,6 @@
 
 from collections import OrderedDict
-from data import load
+from metadata import load
 from copy import deepcopy
 
 class Mark(object):
@@ -20,11 +20,11 @@ class Mark(object):
         circle = "circle"
         rect = "rect"
 
-    def __init__(self, marktype, markclass, marktag, data):
+    def __init__(self, marktype, markclass, marktag, metadata):
         self.marktype = marktype
         self.markclass = markclass
         self.marktag = marktag
-        self.data = data
+        self.metadata = metadata
 
 def bind_marks(marktype, markclass, marktag):
     def mark(binding):
@@ -98,7 +98,7 @@ class Subplot(object):
 
 class Design(object):
 
-    def __init__(self, subplots=None, data=None):
+    def __init__(self, subplots=None, metadata=None):
         self.subplots = subplots if subplots else {}
         self.nrows = 0
         self.ncols = 0
@@ -110,7 +110,7 @@ class Design(object):
         if subplots:
             self.haxes = dict([(s.ridx, s.hpos) for s in self.subplots.itervalues()])
             self.vaxes = dict([(s.cidx, s.vpos) for s in self.subplots.itervalues()])
-        self.data = data
+        self.metadata = metadata
         self.tasks = OrderedDict()
         self.color = None
         self.color_ordinal = False
@@ -121,7 +121,7 @@ class Design(object):
         self.color_ordinal = deepcopy(design.color_ordinal)
         self.cordering = deepcopy(design.cordering)
 
-    def render(self):
+    def render(self, metadatabase, query):
         return {
             "nrows": self.nrows,
             "ncols": self.ncols,
@@ -130,7 +130,7 @@ class Design(object):
             "color_ordinal": self.color_ordinal,
             "cordering": self.cordering,
             "subplots": [s.render() for s in self.subplots.itervalues()],
-            "data": load(self.data)
+            "data": load(database, metadata, query)
         }
 
     def __repr__(self): # TODO: Fix these to be consistent with Python convention.

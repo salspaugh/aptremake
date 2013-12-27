@@ -124,11 +124,11 @@ class Color(RetinalList):
         if RetinalList.can_encode(relation):
             if (isinstance(relation, FunctionalDependency) \
                 and (relation.dependent.type == Type.nominal \
-                    or (relation.dependent.type == Type.ordinal and len(relation.dependent.tuples) < 11))) \
+                    or (relation.dependent.type == Type.ordinal and len(relation.dependent.domain) < 11))) \
                 or \
                 (isinstance(relation, Set) \
                 and (relation.type == Type.nominal \
-                    or (relation.type == Type.ordinal and len(relation.tuples) < 11))):
+                    or (relation.type == Type.ordinal and len(relation.domain) < 11))):
                 return True
         return False
     
