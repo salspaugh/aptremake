@@ -6,10 +6,10 @@ store = {}
 
 class Type(object):
 
-    nominal = "NOMINAL"
-    quantitative = "QUANTITATIVE"
-    ordinal = "ORDINAL"
-    location = "LOCATION"
+    nominal = "nominal"
+    quantitative = "quantitative"
+    ordinal = "ordinal"
+    location = "location"
 
 class Relation(object):
     
