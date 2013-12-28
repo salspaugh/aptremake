@@ -1,6 +1,6 @@
 
 from encoding import SinglePosition, ApposedPosition, RetinalList, Map, Connection, Miscellaneous
-from data import *
+from metadata import *
 from design import *
 from collections import OrderedDict
 

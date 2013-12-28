@@ -1,6 +1,6 @@
 
 from copy import deepcopy
-from data import *
+from metadata import *
 from design import *
 
 def compose(designs):

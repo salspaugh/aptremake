@@ -4,7 +4,7 @@ from werkzeug import secure_filename
 
 from aptremake import app
 from apt import test, generate_presentation
-from data import read_data
+from metadata import read_data
 
 import json
 

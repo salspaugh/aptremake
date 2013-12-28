@@ -1,6 +1,6 @@
 
 from languages import Task
-from data import Type, Set, FunctionalDependency, CartesianProduct
+from metadata import Type, Set, FunctionalDependency, CartesianProduct
 
 quantitative = {
     Task.position: 0,

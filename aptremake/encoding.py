@@ -1,5 +1,5 @@
 
-from data import CartesianProduct, FunctionalDependency, Set, Type
+from metadata import CartesianProduct, FunctionalDependency, Set, Type
 
 class Encoding(object):
 
