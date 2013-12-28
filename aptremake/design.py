@@ -120,7 +120,7 @@ class Design(object):
         self.color_ordinal = deepcopy(design.color_ordinal)
         self.cordering = deepcopy(design.cordering)
 
-    def render(self, database, labels, query):
+    def render(self, database, query, labels):
         return {
             "nrows": self.nrows,
             "ncols": self.ncols,
