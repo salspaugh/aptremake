@@ -39,7 +39,7 @@ class HorizontalAxis(SinglePosition):
         subplot.hordering = relation.dependent.ordering
         subplot.hpos_nominal = relation.dependent.type == Type.nominal
         subplot.hpos_ordinal = relation.dependent.type == Type.ordinal
-        d = Design(subplots={(0,0): subplot}, data=relation.data) 
+        d = Design(subplots={(0,0): subplot}) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
         #d.tasks[None] = (None, Task.position)
@@ -61,7 +61,7 @@ class VerticalAxis(SinglePosition):
         subplot.vordering = relation.dependent.ordering
         subplot.vpos_nominal = relation.dependent.type == Type.nominal
         subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
-        d = Design(subplots={(0,0): subplot}, data=relation.data) 
+        d = Design(subplots={(0,0): subplot}) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
         #d.tasks[None] = (None, Task.position)
@@ -101,7 +101,7 @@ class BarChart(ApposedPosition):
             subplot.vordering = relation.dependent.ordering
             subplot.vpos_nominal = relation.dependent.type == Type.nominal
             subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
-            d = Design(subplots={(0,0): subplot}, data=relation.data) 
+            d = Design(subplots={(0,0): subplot}) 
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
             return d
@@ -135,7 +135,7 @@ class Color(RetinalList):
     @classmethod
     def design(cls, relation):
         if isinstance(relation, FunctionalDependency):
-            d = Design(data=relation.data) 
+            d = Design() 
             d.color = relation.dependent.name
             d.color_ordinal = relation.dependent.type == Type.ordinal
             d.cordering = relation.dependent.ordering
@@ -143,7 +143,7 @@ class Color(RetinalList):
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
             return d
         if isinstance(relation, Set):
-            d = Design(data=relation.data) 
+            d = Design() 
             d.color = relation.name
             d.color_ordinal = relation.type == Type.ordinal
             d.cordering = relation.ordering

@@ -4,7 +4,7 @@ from werkzeug import secure_filename
 
 from aptremake import app
 from apt import test, generate_presentation
-from metadata import read_data
+from metadata import read_metadata
 
 import json
 
@@ -12,7 +12,7 @@ CARS = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars
 
 @app.route("/", methods=["GET", "POST"])
 def design():
-    relations = read_data(CARS)
+    relations = read_metadata(CARS)
     design, selection_data = test()
     if request.method == "POST":
         selection_data = json.loads(request.form["relations"])

@@ -81,10 +81,9 @@ def read_metadata(specfilename):
                 d.metadata = [d.determinant.name, d.dependent.name]
     return metadata
 
-def load(database, metadata, query):
+def load(database, query, labels):
     db = connect(database)
     cursor = db.execute(query)
-
-    data = [dict(zip(columns, tup)) for tup in cursor.fetchall()]
+    data = [dict(zip(labels, tup)) for tup in cursor.fetchall()]
     db.close()
     return data

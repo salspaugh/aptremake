@@ -2,8 +2,8 @@
 from metadata import read_metadata, Relation
 from plantree import RootNode, PresentationTreeNode
 
-def generate_presentation(database, metadata, query):
-    plan = RootNode(database, metadata, query)
+def generate_presentation(database, metadata, query, labels):
+    plan = RootNode(database, metadata, query, labels)
     stack = [plan]
     while len(stack) > 0:
         node = stack.pop(0)
