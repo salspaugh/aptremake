@@ -19,6 +19,9 @@ class PlanTreeNode(object):
     def add_children(self, children):
         for child in children:
             self.add_child(child)
+
+    def generate_children(self):
+        pass
     
     def flatten(self, container):
         for i in container:
