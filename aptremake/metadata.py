@@ -30,7 +30,7 @@ class Set(Relation):
         Relation.__init__(self, name=name)
 
     def __repr__(self):
-        return " ".join(["Set:", self.name, "(type: ", str(self.type) + ")"])
+        return " ".join(["<Set:", self.name, "(type: ", str(self.type) + ")>"])
 
 class FunctionalDependency(Relation):
     
@@ -41,7 +41,7 @@ class FunctionalDependency(Relation):
         Relation.__init__(self, name=name)
 
     def __repr__(self):
-        return " ".join(["FunctionalDependency:", self.name, "(determinant:", str(self.determinant), "dependent:", str(self.dependent) + ")"])
+        return " ".join(["<FunctionalDependency:", self.name, "(determinant:", str(self.determinant), "dependent:", str(self.dependent) + ")>"])
 
 class CartesianProduct(Relation):
     
@@ -52,7 +52,7 @@ class CartesianProduct(Relation):
         Relation.__init__(self, name=name)
 
     def __repr__(self):
-        return " ".join(["CartesianProduct:", self.name, "(sets:", str(self.sets) + ")"])
+        return " ".join(["<CartesianProduct:", self.name, "(sets:", str(self.sets) + ")>"])
 
 classes = {
     "Set": Set, 
