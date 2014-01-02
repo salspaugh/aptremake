@@ -71,7 +71,7 @@ def axes_compatible(designa, designb):
         subplotb = designb.subplots[idx]
         compatible = (subplota.haxis and not subplotb.haxis and not subplota.vaxis and subplotb.vaxis) or \
                     (not subplota.haxis and subplotb.haxis and subplota.vaxis and not subplotb.vaxis)
-        if not (compatible and subplota.marks.data == subplotb.marks.data):
+        if not (compatible and subplota.marks.metadata == subplotb.marks.metadata):
             return False
     return True
 
@@ -81,7 +81,6 @@ def merge_compatible_axes(designa, designb):
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     new_design.haxes = (deepcopy(designa.haxes) if len(designb.haxes) == 0 else deepcopy(designb.haxes))
     new_design.vaxes = (deepcopy(designa.vaxes) if len(designb.vaxes) == 0 else deepcopy(designb.vaxes))
-    new_design.data = list(set(designa.data + designb.data))
     for (idx, subplota) in designa.subplots.iteritems():
         subplotb = designb.subplots[idx]
         new_subplot = Subplot(deepcopy(subplota.marks))
@@ -97,7 +96,6 @@ def merge_matching_axes(designa, designb):
     # TODO: Make multi-mark plots work
     #for (idx, subplot) in designa.subplots.iteritems():
     #    subplot.marks.append(designb.subplots[idx])
-    new_design.data = list(set(designa.data + designb.data))
     return new_design
 
 def concat_subplots_below(designa, designb):
@@ -110,7 +108,6 @@ def concat_subplots_below(designa, designb):
         new_subplot.ridx += new_design.nrows
         new_design.subplots[(r+new_design.nrows, c)] = new_subplot
     new_design.nrows += designb.nrows
-    new_design.data = list(set(designa.data + designb.data))
     return new_design
     
 def concat_subplots_right(designa, designb):
@@ -123,6 +120,5 @@ def concat_subplots_right(designa, designb):
         new_subplot.cidx += new_design.ncols
         new_design.subplots[(r, c+new_design.ncols)] = new_subplot
     new_design.ncols += designb.ncols
-    new_design.data = list(set(designa.data + designb.data))
     return new_design
     
