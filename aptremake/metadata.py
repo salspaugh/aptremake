@@ -25,7 +25,7 @@ class Set(Relation):
         self.type = None
         self.domain = None
         self.ordering = None 
-        self.determinant = self
+        self.determinant = self # This is kludgy.
         self.dependent = self 
         Relation.__init__(self, name=name)
 
@@ -60,6 +60,21 @@ classes = {
     "CartesianProduct": CartesianProduct
 }
 
+def validate(relation):
+    if isinstance(relation, FunctionalDependency):
+        if not relation.determinant:
+            raise AttributeError("Attribute 'determinant' not set.")
+        if not relation.dependent:
+            raise AttributeError("Attribute 'dependent' not set.")
+    if isinstance(relation, Set):
+        if not relation.domain:
+            raise AttributeError("Attribute 'domain' not set.")
+        if not relation.type:
+            raise AttributeError("Attribute 'type' not set.")
+    if not relation.arity:
+        raise AttributeError("Attribute 'arity' not set.")
+    raise AttributeError("Invalid input type (must be FunctionalDependency or Set).") 
+
 def read_metadata(specfilename):
     metadata = {}
     with open(specfilename) as specfile:
@@ -76,8 +91,8 @@ def read_metadata(specfilename):
         for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":
                 d = metadata[s["name"]]
-                d.determinant = metadata[s["domain"]]
-                d.dependent = metadata[s["range"]]
+                d.determinant = metadata[s["determinant"]]
+                d.dependent = metadata[s["dependent"]]
                 d.metadata = [d.determinant.name, d.dependent.name]
     return metadata
 

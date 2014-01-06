@@ -3,6 +3,8 @@ from metadata import read_metadata, Relation
 from plantree import RootNode, PresentationTreeNode
 
 def generate_presentation(database, metadata, query, labels, limit=5):
+    for relation in metadata:
+        validate(relation)
     count = 0
     plan = RootNode(database, metadata, query, labels)
     stack = [plan]
