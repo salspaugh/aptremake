@@ -3,8 +3,10 @@ from metadata import Relation
 from languages import _languages
 from ranking import rank
 from composition import compose
+from logging import basicConfig, debug, DEBUG
 
 INDENT = '    '
+basicConfig(filename='aptremake.log', level=DEBUG)
 
 class PlanTreeNode(object):
 
@@ -124,18 +126,16 @@ class SelectionTreeNode(PlanTreeNode):
         PlanTreeNode.__init__(self)
     
     def generate_children(self):
-        print "================================================================"
-        print "TRYING:"
-        print
+        debug("================================================================")
+        debug("TRYING:")
         for s in self.selections:
-            print s
-            print
+            debug(s)
         design = compose(self.selections)
         if design:
             c = CompositionTreeNode(self.database, design, self.query, self.labels)
             self.add_child(c)
         else:
-            print "FAILED"
+            debug("FAILED")
 
     def __repr__(self):
         return " ".join(["SELECTION:"] + [str(s) for s in self.selections])

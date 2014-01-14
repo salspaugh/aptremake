@@ -2,14 +2,16 @@
 from copy import deepcopy
 from metadata import *
 from design import *
+from logging import basicConfig, debug, DEBUG
+
+basicConfig(filename='aptremake.log', level=DEBUG)
 
 def compose(designs):
     # TODO: Verify that designs is a list of designs.
-    print "--------------------------------------------------------------------"
-    print "COMPOSING:"
+    debug("--------------------------------------------------------------------")
+    debug("COMPOSING:")
     for d in designs:
-        print d
-        print
+        debug(d)
     if len(designs) == 0:
         return []
     if len(designs) == 1:
@@ -76,7 +78,7 @@ def axes_compatible(designa, designb):
     return True
 
 def merge_compatible_axes(designa, designb):
-    print "Merging compatible axes"
+    debug("Merging compatible axes")
     new_design = deepcopy(designa)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     new_design.haxes = (deepcopy(designa.haxes) if len(designb.haxes) == 0 else deepcopy(designb.haxes))
@@ -90,7 +92,7 @@ def merge_compatible_axes(designa, designb):
     return new_design
 
 def merge_matching_axes(designa, designb):
-    print "Merging matching axes"
+    debug("Merging matching axes")
     new_design = deepcopy(designa) if len(designa.subplots) > 0 else deepcopy(designb)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     # TODO: Make multi-mark plots work
@@ -99,7 +101,7 @@ def merge_matching_axes(designa, designb):
     return new_design
 
 def concat_subplots_below(designa, designb):
-    print "Concatenating subplots below"
+    debug("Concatenating subplots below")
     new_design = deepcopy(designa)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     for (idx, subplot) in designb.subplots.iteritems():
@@ -111,7 +113,7 @@ def concat_subplots_below(designa, designb):
     return new_design
     
 def concat_subplots_right(designa, designb):
-    print "Concatenating subplots right"
+    debug("Concatenating subplots right")
     new_design = deepcopy(designa)
     new_design.copy_color(designa) if designa.color else new_design.copy_color(designb)
     for (idx, subplot) in designb.subplots.iteritems():
