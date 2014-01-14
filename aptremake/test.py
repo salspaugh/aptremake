@@ -4,42 +4,55 @@ from apt import generate_presentation
 
 """
 Test Cases:
-    (nominal -> nominal)
+    (nominal -> nominal -> ordinalminal)
     (nominal -> ordinal)
     (nominal -> quantitative)
-    (nominal -> nominal), (nominal -> nominal)
-    (nominal -> ordinal), (nominal -> nominal)
-    (nominal -> quantitative), (nominal -> nominal)
-    (nominal -> nominal), (nominal -> ordinal)
+    (nominal -> nominal -> ordinalminal), (nominal -> nominal -> ordinalminal)
+    (nominal -> ordinal), (nominal -> nominal -> ordinalminal)
+    (nominal -> quantitative), (nominal -> nominal -> ordinalminal)
+    (nominal -> nominal -> ordinalminal), (nominal -> ordinal)
     (nominal -> ordinal), (nominal -> ordinal)
     (nominal -> quantitative), (nominal -> ordinal)
-    (nominal -> nominal), (nominal -> quantitative)
+    (nominal -> nominal -> ordinalminal), (nominal -> quantitative)
     (nominal -> ordinal), (nominal -> quantitative)
     - (nominal -> quantitative), (nominal -> quantitative)
 """
 
 def run_all_tests():
-    #test_fdnn_fdnn()
-    #test_fdno_fdnn()
+    test_fdnn_fdnn()
+    test_fdnn_fdno()    
+    test_fdnn_fdnq()
     test_fdnq_fdnn()
     test_fdnq_fdno()    
     test_fdnq_fdnq()
     test_fdnq_fdnq_fdnq()
 
+def test_fdnn_fdnn():
+    print "CASE: {FD: nominal -> nominal, FD: nominal -> nominal}"
+    test_columns(["Car nationality for 1979", "Car nationality for 1979"])
+
+def test_fdnn_fdno():
+    print "CASE: {FD: nominal -> nominal, FD: nominal -> ordinal}"
+    test_columns(["Car nationality for 1979", "Repair record for 1979"])
+
+def test_fdnn_fdnq():
+    print "CASE: {FD: nominal -> nominal, FD: nominal -> quantitative}"
+    test_columns(["Car nationality for 1979", "Car weight for 1979"])
+
 def test_fdnq_fdnn():
-    print "CASE: {fdnq, fdnn}"
+    print "CASE: {FD: nominal -> nominal, FD: nominal -> nominal}"
     test_columns(["Car mileage for 1979", "Car nationality for 1979"])
 
 def test_fdnq_fdno():
-    print "CASE: {fdnq, fdno}"
+    print "CASE: {FD: nominal -> quantitative, FD: nominal -> ordinal}"
     test_columns(["Car mileage for 1979", "Repair record for 1979"])
 
 def test_fdnq_fdnq():
-    print "CASE: {fdnq, fdnq}"
+    print "CASE: {FD: nominal -> quantitative, FD: nominal -> quantitative}"
     test_columns(["Car mileage for 1979", "Car weight for 1979"])
 
 def test_fdnq_fdnq_fdnq():
-    print "CASE: {fdnq, fdnq, fdnq}"
+    print "CASE: {FD: nominal -> quantitative, FD: nominal -> quantitative, FD: nominal -> quantitative}"
     test_columns(["Car mileage for 1979", "Car weight for 1979", "Car price for 1979"])
 
 def test_columns(keys):
@@ -58,6 +71,8 @@ def print_visualization_type(visualization):
             type = "scatterplot"
         if is_barchart(visualization):
             type = "barchart"
+        if is_column_barcharts(visualization):
+            type = "column barcharts"
         if type and uses_color(visualization):
             type = "color " + type
         elif type:
@@ -80,16 +95,32 @@ def uses_color(design):
 def is_scatterplot(design):
     if len(design["subplots"]) == 1:
         plot = design["subplots"][0] 
-        if plot["markType"] == "point":
+        if plot_is_scatterplot(plot):
             return True
     return False
 
 def is_barchart(design):
     if len(design["subplots"]) == 1:
         plot = design["subplots"][0]
-        if plot["markType"] == "bar":
+        if plot_is_barchart(plot):
             return True
     return False
+
+def is_column_barcharts(design):
+    if design["nrows"] > 1 and design["ncols"] == 1:
+        for plot in design["subplots"]:
+            if not plot_is_scatterplot(plot):
+                return False
+        return True
+    return False
+
+def plot_is_scatterplot(plot):
+    if plot["markType"] == "point":
+        return True
+
+def plot_is_barchart(plot):
+    if plot["markType"] == "bar":
+        return True
 
 if __name__ == "__main__":
     run_all_tests()

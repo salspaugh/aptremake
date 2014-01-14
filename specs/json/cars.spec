@@ -5,7 +5,7 @@
         {
             "name": "Car",
             "class": "Set",
-            "type": "NOMINAL",
+            "type": "nominal",
             "domain": "Car",
             "arity": 1,
             "data": ["Accord", "AMC Pacer", "Audi 5000", "BMW 320i", "Champ", "Chev Nova", "Civic", "Datsun 210", "Datsun 810", "Deville", "Le Car", "Linc Cont", "Horizon", "Mustang", "Peugot", "Saab 900", "Subaru", "Volvo 260", "VW Dasher"]
@@ -13,7 +13,7 @@
         {
             "name": "Nation",
             "class": "Set",
-            "type": "NOMINAL",
+            "type": "nominal",
             "arity": 1,
             "data": ["USA", "Japan", "Germany", "France", "Sweden"]
         },
@@ -28,7 +28,7 @@
         {
             "name": "Price",
             "class": "Set",
-            "type": "QUANTITATIVE",
+            "type": "quantitative",
             "domain": "Price",
             "arity": 1,
             "data": [5900, 4250, 10000, 10100, 4000, 3700, 4000, 4100, 8250, 11250, 3650, 11500, 4000, 3850, 13000, 9000, 3600, 12000, 7000]
@@ -44,7 +44,7 @@
         {
             "name": "Repair",
             "class": "Set",
-            "type": "ORDINAL",
+            "type": "ordinal",
             "domain": "Repair",
             "ordering": {
                 "Great": 5,
@@ -67,7 +67,7 @@
         {
             "name": "Mileage",
             "class": "Set",
-            "type": "QUANTITATIVE",
+            "type": "quantitative",
             "domain": "Mileage",
             "arity": 1,
             "data": [25, 17, 17, 25, 32, 18, 28, 35, 20, 13, 25, 12, 23, 20, 15, 20, 33, 17, 22]
@@ -83,7 +83,7 @@
         {
             "name": "Weight",
             "class": "Set",
-            "type": "QUANTITATIVE",
+            "type": "quantitative",
             "domain": "Weight",
             "arity": 1,
             "data": [2000, 3200, 3000, 2900, 1600, 3200, 1600, 1700, 3000, 4000, 1550, 4500, 2200, 3000, 3500, 3000, 1800, 3100, 1800]
