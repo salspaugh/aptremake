@@ -61,26 +61,27 @@ classes = {
 }
 
 def validate(relation):
+    if not relation.arity:
+        raise AttributeError("Attribute 'arity' not set.")
     if isinstance(relation, FunctionalDependency):
         if not relation.determinant:
             raise AttributeError("Attribute 'determinant' not set.")
         if not relation.dependent:
             raise AttributeError("Attribute 'dependent' not set.")
-    if isinstance(relation, Set):
+    elif isinstance(relation, Set):
         if not relation.domain:
             raise AttributeError("Attribute 'domain' not set.")
         if not relation.type:
             raise AttributeError("Attribute 'type' not set.")
-    if not relation.arity:
-        raise AttributeError("Attribute 'arity' not set.")
-    raise AttributeError("Invalid input type (must be FunctionalDependency or Set).") 
+        return
+    else:
+        raise AttributeError("Invalid input type (must be FunctionalDependency or Set).") 
 
 def read_metadata(specfilename):
     metadata = {}
     with open(specfilename) as specfile:
         spec = json.load(specfile)
-        metadatabase = spec["metadatabase"]
-        query = spec["query"]
+        metadata["database"] = spec["database"]
         for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)

@@ -3,7 +3,9 @@ from collections import OrderedDict
 from metadata import load
 from copy import deepcopy
 
-class Mark(object):
+class Mark(object): # This is a weird way to handle this.
+# Done this way because we need to somehow record all the various CSS classes 
+# and tags to use.
 
     class MarkType(object):
 
@@ -25,6 +27,12 @@ class Mark(object):
         self.markclass = markclass
         self.marktag = marktag
         self.metadata = metadata
+
+    def is_scatterplot_mark(self):
+        return self.marktype == Mark.MarkType.point
+
+    def is_barchart_mark(self):
+        return self.marktype == Mark.MarkType.bar
 
 def bind_marks(marktype, markclass, marktag):
     def mark(binding):

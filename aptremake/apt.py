@@ -1,5 +1,5 @@
 
-from metadata import read_metadata, Relation
+from metadata import read_metadata, validate, Relation
 from plantree import RootNode, PresentationTreeNode
 
 def generate_presentation(database, metadata, query, labels, limit=5):
