@@ -2,26 +2,13 @@
 from metadata import read_metadata
 from apt import generate_presentation
 
-"""
-Test Cases:
-    (nominal -> nominal -> ordinalminal)
-    (nominal -> ordinal)
-    (nominal -> quantitative)
-    (nominal -> nominal -> ordinalminal), (nominal -> nominal -> ordinalminal)
-    (nominal -> ordinal), (nominal -> nominal -> ordinalminal)
-    (nominal -> quantitative), (nominal -> nominal -> ordinalminal)
-    (nominal -> nominal -> ordinalminal), (nominal -> ordinal)
-    (nominal -> ordinal), (nominal -> ordinal)
-    (nominal -> quantitative), (nominal -> ordinal)
-    (nominal -> nominal -> ordinalminal), (nominal -> quantitative)
-    (nominal -> ordinal), (nominal -> quantitative)
-    - (nominal -> quantitative), (nominal -> quantitative)
-"""
-
 def run_all_tests():
     test_fdnn_fdnn()
     test_fdnn_fdno()    
     test_fdnn_fdnq()
+    test_fdno_fdnn()
+    test_fdno_fdno()    
+    test_fdno_fdnq()
     test_fdnq_fdnn()
     test_fdnq_fdno()    
     test_fdnq_fdnq()
@@ -37,6 +24,18 @@ def test_fdnn_fdno():
 
 def test_fdnn_fdnq():
     print "CASE: {FD: nominal -> nominal, FD: nominal -> quantitative}"
+    test_columns(["Car nationality for 1979", "Car weight for 1979"])
+
+def test_fdno_fdnn():
+    print "CASE: {FD: nominal -> ordinal, FD: nominal -> nominal}"
+    test_columns(["Car nationality for 1979", "Car nationality for 1979"])
+
+def test_fdno_fdno():
+    print "CASE: {FD: nominal -> ordinal, FD: nominal -> ordinal}"
+    test_columns(["Car nationality for 1979", "Repair record for 1979"])
+
+def test_fdno_fdnq():
+    print "CASE: {FD: nominal -> ordinal, FD: nominal -> quantitative}"
     test_columns(["Car nationality for 1979", "Car weight for 1979"])
 
 def test_fdnq_fdnn():
@@ -66,19 +65,19 @@ def test_columns(keys):
         print_visualization_type(visualization)
 
 def print_visualization_type(visualization):
-        type = ""
-        if is_scatterplot(visualization):
-            type = "scatterplot"
-        if is_barchart(visualization):
-            type = "barchart"
-        if is_column_barcharts(visualization):
-            type = "column barcharts"
-        if type and uses_color(visualization):
-            type = "color " + type
-        elif type:
-            type = "bw " + type
-        if type:
-            print "\t" + type
+    type = ""
+    if is_scatterplot(visualization):
+        type = "scatterplot"
+    if is_barchart(visualization):
+        type = "barchart"
+    if is_column_barcharts(visualization):
+        type = "column barcharts"
+    if type and uses_color(visualization):
+        type = "color " + type
+    elif type:
+        type = "bw " + type
+    if type:
+        print "\t" + type
 
 def read_test_metadata():
     car_metadata = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec"
@@ -91,6 +90,13 @@ def construct_test_query(relations):
 
 def uses_color(design):
     return design["hasColor"]
+
+def is_single_axis(design):
+    if len(design["subplots"]) == 1:
+        plot = design["subplots"][0] 
+        if plot_is_single_axis(plot):
+            return True
+    return False
 
 def is_scatterplot(design):
     if len(design["subplots"]) == 1:
@@ -114,13 +120,22 @@ def is_column_barcharts(design):
         return True
     return False
 
-def plot_is_scatterplot(plot):
-    if plot["markType"] == "point":
+def plot_is_single_axis(plot):
+    if plot["hpos"] and not plot["vpos"] and plot["markType"] == "point":
         return True
+    if not plot["hpos"] and plot["vpos"] and plot["markType"] == "point":
+        return True
+    return False
+
+def plot_is_scatterplot(plot):
+    if plot["hpos"] and plot["vpos"] and plot["markType"] == "point":
+        return True
+    return False
 
 def plot_is_barchart(plot):
-    if plot["markType"] == "bar":
+    if plot["hpos"] and plot["vpos"] and plot["markType"] == "bar":
         return True
+    return False
 
 if __name__ == "__main__":
     run_all_tests()
