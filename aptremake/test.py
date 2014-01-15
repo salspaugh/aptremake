@@ -3,6 +3,7 @@ from metadata import read_metadata
 from apt import generate_presentation
 
 def run_all_tests():
+    
     test_fdnn_fdnn()
     test_fdnn_fdno()    
     test_fdnn_fdnq()
@@ -12,7 +13,22 @@ def run_all_tests():
     test_fdnq_fdnn()
     test_fdnq_fdno()    
     test_fdnq_fdnq()
+
+    test_fdnn_fdnq_fdnn()
+    test_fdnn_fdnq_fdno()    
+    test_fdnn_fdnq_fdnq()
+    
+    test_fdno_fdnq_fdnn()
+    test_fdno_fdnq_fdno()    
+    test_fdno_fdnq_fdnq()
+    
+    test_fdnq_fdnq_fdnn()
+    test_fdnq_fdnq_fdno()    
     test_fdnq_fdnq_fdnq()
+
+    #columns["fd:nominal->nominal"] = ["Car nationality for 1979"]
+    #columns["fd:nominal->ordinal"] = ["Repair record for 1979"]
+    #columns["fd:nominal->quantitative"] = []
 
 def test_fdnn_fdnn():
     print "CASE: {FD: nominal -> nominal, FD: nominal -> nominal}"
@@ -50,9 +66,41 @@ def test_fdnq_fdnq():
     print "CASE: {FD: nominal -> quantitative, FD: nominal -> quantitative}"
     test_columns(["Car mileage for 1979", "Car weight for 1979"])
 
+def test_fdnn_fdnq_fdnn():
+    print "CASE: {FD: nominal -> nominal, nominal -> nominal, FD: nominal -> nominal}"
+    test_columns(["Car nationality for 1979", "Car mileage for 1979", "Car nationality for 1979"])
+
+def test_fdnn_fdnq_fdno():
+    print "CASE: {FD: nominal -> nominal, nominal -> quantitative, FD: nominal -> ordinal}"
+    test_columns(["Car nationality for 1979", "Car mileage for 1979", "Repair record for 1979"])
+
+def test_fdnn_fdnq_fdnq():
+    print "CASE: {FD: nominal -> nominal, nominal -> quantitative, FD: nominal -> quantitative, FD: nominal -> quantitative}"
+    test_columns(["Car nationality for 1979", "Car weight for 1979", "Car price for 1979"])
+
+def test_fdno_fdnq_fdnn():
+    print "CASE: {FD: nominal -> ordinal, nominal -> nominal, FD: nominal -> nominal}"
+    test_columns(["Repair record for 1979", "Car mileage for 1979", "Car nationality for 1979"])
+
+def test_fdno_fdnq_fdno():
+    print "CASE: {FD: nominal -> ordinal, nominal -> quantitative, FD: nominal -> ordinal}"
+    test_columns(["Repair record for 1979", "Car mileage for 1979", "Repair record for 1979"])
+
+def test_fdno_fdnq_fdnq():
+    print "CASE: {FD: nominal -> ordinal, FD: nominal -> quantitative, FD: nominal -> quantitative}"
+    test_columns(["Repair record for 1979", "Car weight for 1979", "Car price for 1979"])
+
+def test_fdnq_fdnq_fdnn():
+    print "CASE: {FD: nominal -> quantitative, nominal -> nominal, FD: nominal -> nominal}"
+    test_columns(["Car weight for 1979", "Car mileage for 1979", "Car nationality for 1979"])
+
+def test_fdnq_fdnq_fdno():
+    print "CASE: {FD: nominal -> quantitative, nominal -> quantitative, FD: nominal -> ordinal}"
+    test_columns(["Car weight for 1979", "Car mileage for 1979", "Repair record for 1979"])
+
 def test_fdnq_fdnq_fdnq():
     print "CASE: {FD: nominal -> quantitative, FD: nominal -> quantitative, FD: nominal -> quantitative}"
-    test_columns(["Car mileage for 1979", "Car weight for 1979", "Car price for 1979"])
+    test_columns(["Car weight for 1979", "Car mileage for 1979", "Car weight for 1979", "Car price for 1979"])
 
 def test_columns(keys):
     metadata = read_test_metadata()
