@@ -18,17 +18,21 @@ def run_all_tests():
     test_fdnn_fdnq_fdno()    
     test_fdnn_fdnq_fdnq()
     
+    #test_fdnn_fdnn_fdnn()
+    #test_fdnn_fdnn_fdno()    
+    #test_fdnn_fdnn_fdnq()
+    
     test_fdno_fdnq_fdnn()
     test_fdno_fdnq_fdno()    
     test_fdno_fdnq_fdnq()
     
+    #test_fdno_fdno_fdnn()
+    #test_fdno_fdno_fdno()    
+    #test_fdno_fdno_fdnq()
+    
     test_fdnq_fdnq_fdnn()
     test_fdnq_fdnq_fdno()    
     test_fdnq_fdnq_fdnq()
-
-    #columns["fd:nominal->nominal"] = ["Car nationality for 1979"]
-    #columns["fd:nominal->ordinal"] = ["Repair record for 1979"]
-    #columns["fd:nominal->quantitative"] = []
 
 def test_fdnn_fdnn():
     print "CASE: {FD: nominal -> nominal, FD: nominal -> nominal}"
@@ -116,16 +120,24 @@ def print_visualization_type(visualization):
     type = ""
     if is_scatterplot(visualization):
         type = "scatterplot"
+    if is_single_axis(visualization):
+        type = "single axis"
     if is_barchart(visualization):
         type = "barchart"
     if is_column_barcharts(visualization):
         type = "column barcharts"
+    if is_row_barcharts(visualization):
+        type = "row barcharts"
     if type and uses_color(visualization):
         type = "color " + type
     elif type:
         type = "bw " + type
     if type:
         print "\t" + type
+    else:
+        del visualization["data"]
+        print visualization
+        print "\tuncategorized"
 
 def read_test_metadata():
     car_metadata = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec"
@@ -163,27 +175,28 @@ def is_barchart(design):
 def is_column_barcharts(design):
     if design["nrows"] > 1 and design["ncols"] == 1:
         for plot in design["subplots"]:
-            if not plot_is_scatterplot(plot):
+            if not plot_is_barchart(plot):
+                return False
+        return True
+    return False
+
+def is_row_barcharts(design):
+    if design["ncols"] > 1 and design["nrows"] == 1:
+        for plot in design["subplots"]:
+            if not plot_is_barchart(plot):
                 return False
         return True
     return False
 
 def plot_is_single_axis(plot):
-    if plot["hpos"] and not plot["vpos"] and plot["markType"] == "point":
-        return True
-    if not plot["hpos"] and plot["vpos"] and plot["markType"] == "point":
-        return True
-    return False
+    return (plot["hasHaxis"] and not plot["hasVaxis"] and plot["markType"] == "point") \
+        or (not plot["hasHaxis"] and plot["hasVaxis"] and plot["markType"] == "point")
 
 def plot_is_scatterplot(plot):
-    if plot["hpos"] and plot["vpos"] and plot["markType"] == "point":
-        return True
-    return False
+    return plot["hasHaxis"] and plot["hasVaxis"] and plot["markType"] == "point"
 
 def plot_is_barchart(plot):
-    if plot["hpos"] and plot["vpos"] and plot["markType"] == "bar":
-        return True
-    return False
+    return plot["hasHaxis"] and plot["hasVaxis"] and plot["markType"] == "bar"
 
 if __name__ == "__main__":
     run_all_tests()
