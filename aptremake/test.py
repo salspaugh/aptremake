@@ -109,7 +109,7 @@ def test_fdnq_fdnq_fdnq():
 def test_columns(keys):
     metadata = read_test_metadata()
     db = metadata["database"]
-    relations = [metadata[k] for k in keys]
+    relations = [metadata["relations"][k] for k in keys]
     query = construct_test_query(relations)
     labels = [r.name for r in relations]
     visualization_generator = generate_presentation(db, relations, query, labels)
@@ -144,8 +144,12 @@ def read_test_metadata():
     return read_metadata(car_metadata) 
 
 def construct_test_query(relations):
-    columns = tuple([r.dependent.name for r in relations])
-    blanks = ", ".join(["%s"]*len(relations))
+    r = relations[0]
+    if len(relations) == 1:
+        columns = tuple([r.determinant.name, r.dependent.name])
+    else:
+        columns = tuple([r.determinant.name] + [r.dependent.name for r in relations])
+    blanks = ", ".join(["%s"]*len(columns))
     return " ".join(["SELECT APTREMAKEID,", blanks, "FROM cars"]) % columns 
 
 def uses_color(design):

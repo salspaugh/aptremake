@@ -309,7 +309,7 @@ _languages = [
     HorizontalAxis,
     VerticalAxis,
 #    LineChart,
-    BarChart,
+#    BarChart,
 #    PlotChart,
     Color,
 #    Shape,

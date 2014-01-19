@@ -82,19 +82,19 @@ def read_metadata(specfilename):
     with open(specfilename) as specfile:
         spec = json.load(specfile)
         metadata["database"] = spec["database"]
+        metadata["relations"] = {}
         for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
             d.domain = s.get("domain", None)
             d.ordering = s.get("ordering", None)
             d.arity = s["arity"]
-            metadata[s["name"]] = d
+            metadata["relations"][s["name"]] = d
         for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":
-                d = metadata[s["name"]]
-                d.determinant = metadata[s["determinant"]]
-                d.dependent = metadata[s["dependent"]]
-                d.metadata = [d.determinant.name, d.dependent.name]
+                d = metadata["relations"][s["name"]]
+                d.determinant = metadata["relations"][s["determinant"]]
+                d.dependent = metadata["relations"][s["dependent"]]
     return metadata
 
 def load(database, query, labels):
