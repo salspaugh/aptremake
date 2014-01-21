@@ -1,5 +1,5 @@
 
-from metadata import read_metadata
+from metadata import read_metadata, View
 from apt import generate_presentation
 
 def run_all_tests():
@@ -111,8 +111,9 @@ def test_columns(keys):
     db = metadata["database"]
     relations = [metadata["relations"][k] for k in keys]
     query = construct_test_query(relations)
-    labels = [r.name for r in relations]
-    visualization_generator = generate_presentation(db, relations, query, labels)
+    keys = [r.name for r in relations]
+    view = View(relations, db, query, keys) 
+    visualization_generator = generate_presentation(view)
     for visualization in visualization_generator:
         print_visualization_type(visualization)
 

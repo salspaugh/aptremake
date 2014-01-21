@@ -4,7 +4,7 @@ from werkzeug import secure_filename
 
 from aptremake import app
 from apt import generate_presentation
-from metadata import read_metadata
+from metadata import read_metadata, View
 from test import construct_test_query
 
 import json
@@ -28,10 +28,11 @@ def design():
         else:    
             r = apt_input[0]
             labels = ["APTREMAKEID", r.determinant.name] + [r.dependent.name for r in apt_input]
-        design = generate_presentation(db, apt_input, query, labels, limit=1).next()
-        print query
-        print labels
-        print design
+        view = View(apt_input, db, query, labels)
+        try:
+            design = generate_presentation(view, limit=1).next()
+        except StopIteration: # nothing generated
+            pass
         for s in selection_data:
             metadata["relations"][s["name"]].selected = True
             metadata["relations"][s["name"]].importance = s["importance"]

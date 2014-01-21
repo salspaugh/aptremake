@@ -128,7 +128,7 @@ class Design(object):
         self.color_ordinal = deepcopy(design.color_ordinal)
         self.cordering = deepcopy(design.cordering)
 
-    def render(self, database, query, labels):
+    def render(self, view):
         return {
             "nrows": self.nrows,
             "ncols": self.ncols,
@@ -137,7 +137,7 @@ class Design(object):
             "color_ordinal": self.color_ordinal,
             "cordering": self.cordering,
             "subplots": [s.render() for s in self.subplots.itervalues()],
-            "data": load(database, query, labels)
+            "data": load(view)
         }
 
     def __repr__(self): # TODO: Fix these to be consistent with Python convention.
