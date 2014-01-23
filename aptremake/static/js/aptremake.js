@@ -218,11 +218,6 @@ function render(plot) {
     var width = +subplotContainer.attr("width") - MARGIN.LEFT - MARGIN.RIGHT;
     var height = +subplotContainer.attr("height") - MARGIN.TOP - MARGIN.BOTTOM;
 
-    //subplotContainer.append("rect") // FIXME: Remove after debugging
-    //  .attr("width", width)
-    //  .attr("height", height)
-    //  .attr("fill", "pink");
-
     console.log("Subplot", subplot);
     marks = drawMarks(subplot, subplotContainer);
     drawHorizontalAxis(marks, subplot, subplotContainer, width, height, bottommost);
@@ -260,10 +255,6 @@ function render(plot) {
     var outer = d3.select("#presentation");
     outer.attr("width", WIDTH_PLUS)
       .attr("height", HEIGHT);
-    //outer.append("rect") // FIXME: Remove after debugging
-    //  .attr("width", WIDTH)
-    //  .attr("height", HEIGHT)
-    //  .attr("fill", "#acb1d3");
     return outer;
   }
 
