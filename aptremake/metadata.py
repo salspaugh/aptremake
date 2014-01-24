@@ -100,6 +100,7 @@ def read_metadata(specfilename):
             d.domain = s.get("domain", None)
             d.ordering = s.get("ordering", None)
             d.arity = s["arity"]
+            d.label = s["label"]
             metadata["relations"][s["name"]] = d
         for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":

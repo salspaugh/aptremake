@@ -35,7 +35,8 @@ class HorizontalAxis(SinglePosition):
     def design(cls, relation):
         subplot = Subplot(Marks["POINTS"](relation.determinant.name))
         subplot.haxis = True
-        subplot.hpos = subplot.hlabel = relation.dependent.name
+        subplot.hpos = relation.dependent.name
+        subplot.hlabel = relation.dependent.label
         subplot.hordering = relation.dependent.ordering
         subplot.hpos_nominal = relation.dependent.type == Type.nominal
         subplot.hpos_ordinal = relation.dependent.type == Type.ordinal
@@ -57,7 +58,8 @@ class VerticalAxis(SinglePosition):
     def design(cls, relation):
         subplot = Subplot(Marks["POINTS"](relation.determinant.name))
         subplot.vaxis = True
-        subplot.vpos = subplot.vlabel = relation.dependent.name
+        subplot.vpos = relation.dependent.name
+        subplot.vlabel = relation.dependent.label
         subplot.vordering = relation.dependent.ordering
         subplot.vpos_nominal = relation.dependent.type == Type.nominal
         subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
@@ -93,11 +95,13 @@ class BarChart(ApposedPosition):
             subplot = Subplot(Marks["BARS"](relation.determinant.name))
             subplot.haxis = True
             subplot.vaxis = True
-            subplot.hpos = subplot.hlabel = relation.determinant.name
+            subplot.hpos = relation.determinant.name
+            subplot.hlabel = relation.determinant.label
             subplot.hordering = relation.determinant.ordering
             subplot.hpos_nominal = relation.determinant.type == Type.nominal
             subplot.hpos_ordinal = relation.determinant.type == Type.ordinal
-            subplot.vpos = subplot.vlabel = relation.dependent.name
+            subplot.vpos = relation.dependent.name
+            subplot.vlabel = relation.dependent.label
             subplot.vordering = relation.dependent.ordering
             subplot.vpos_nominal = relation.dependent.type == Type.nominal
             subplot.vpos_ordinal = relation.dependent.type == Type.ordinal

@@ -4,6 +4,7 @@
     "relations": [
         {
             "name": "Car",
+            "label": "Fahrzeug",
             "class": "Set",
             "type": "nominal",
             "domain": "Car",
@@ -12,6 +13,7 @@
         },
         {
             "name": "Nation",
+            "label": "Land",
             "class": "Set",
             "type": "nominal",
             "arity": 1,
@@ -19,6 +21,7 @@
         },
         {
             "name": "Car nationality for 1979",
+            "label": "Nationalitaet fuer Fahrzeug am 1979",
             "class": "FunctionalDependency",
             "determinant": "Car",
             "dependent": "Nation",
@@ -27,6 +30,7 @@
         },
         {
             "name": "Price",
+            "label": "Preis",
             "class": "Set",
             "type": "quantitative",
             "domain": "Price",
@@ -35,6 +39,7 @@
         }, 
         {
             "name": "Car price for 1979",
+            "label": "Preis fuer Fahrzeug am 1979",
             "class": "FunctionalDependency",
             "determinant": "Car",
             "dependent": "Price",
@@ -43,6 +48,7 @@
         },
         {
             "name": "Repair",
+            "label": "Zustand",
             "class": "Set",
             "type": "ordinal",
             "domain": "Repair",
@@ -58,6 +64,7 @@
         },
         {
             "name": "Repair record for 1979",
+            "label": "Zustand von Fahrzeug am 1979",
             "class": "FunctionalDependency",
             "determinant": "Car",
             "dependent": "Repair",
@@ -66,6 +73,7 @@
         },
         {
             "name": "Mileage",
+            "label": "Kraftstoffverbrauch",
             "class": "Set",
             "type": "quantitative",
             "domain": "Mileage",
@@ -74,6 +82,7 @@
         },
         {
             "name": "Car mileage for 1979",
+            "label": "Kraftsoffverbrauch am 1979",
             "class": "FunctionalDependency",
             "determinant": "Car",
             "dependent": "Mileage",
@@ -82,6 +91,7 @@
         },
         {
             "name": "Weight",
+            "label": "Gewicht",
             "class": "Set",
             "type": "quantitative",
             "domain": "Weight",
@@ -90,6 +100,7 @@
         },
         {
             "name": "Car weight for 1979",
+            "label": "Gewicht von Fahrzeug am 1979",
             "class": "FunctionalDependency",
             "determinant": "Car",
             "dependent": "Weight",
