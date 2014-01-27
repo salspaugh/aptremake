@@ -28,6 +28,7 @@ class Relation(object):
         self.selected = False # FIXME: These attributes are tied to the
         self.importance = -1 # visualization rendering and probably shouldn't be here.
         self.label = name
+        self.coding = None
 
 class Set(Relation):
     
@@ -93,14 +94,16 @@ def read_metadata(specfilename):
     with open(specfilename) as specfile:
         spec = json.load(specfile)
         metadata["database"] = spec["database"]
+        metadata["table"] = spec["table"]
         metadata["relations"] = {}
         for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
             d.domain = s.get("domain", None)
             d.ordering = s.get("ordering", None)
-            d.arity = s["arity"]
-            d.label = s["label"]
+            d.arity = s.get("arity", None)
+            d.label = s.get("label", None)
+            d.coding = s.get("coding", None)
             metadata["relations"][s["name"]] = d
         for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":

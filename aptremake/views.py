@@ -9,19 +9,20 @@ from test import construct_test_query
 
 import json
 
-CARS = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec"
+CARS = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars_coded.spec"
 
 @app.route("/", methods=["GET", "POST"])
 def design():
     metadata = read_metadata(CARS)
     db = metadata["database"]
+    table = metadata["table"]
     design = None
     button_data = [{"name": r.name, "selected": False, "importance": -1} for r in metadata["relations"].values()]
     if request.method == "POST":
         selection_data = json.loads(request.form["relations"])
         apt_input = sorted(selection_data, key=lambda x: int(x["importance"]))
         apt_input = [metadata["relations"][s["name"]] for s in apt_input]
-        query = construct_test_query(apt_input) 
+        query = construct_test_query(apt_input, table) 
         if len(apt_input) == 1:
             r = apt_input[0]
             labels = ["APTREMAKEID"] + [r.determinant.name, r.dependent.name]

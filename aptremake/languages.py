@@ -40,6 +40,9 @@ class HorizontalAxis(SinglePosition):
         subplot.hordering = relation.dependent.ordering
         subplot.hpos_nominal = relation.dependent.type == Type.nominal
         subplot.hpos_ordinal = relation.dependent.type == Type.ordinal
+        subplot.hpos_quantitative = relation.dependent.type == Type.quantitative
+        if subplot.hpos_nominal or subplot.hpos_ordinal:
+            subplot.hpos_coding = relation.determinant.coding
         d = Design(subplots={(0,0): subplot}) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
@@ -63,6 +66,9 @@ class VerticalAxis(SinglePosition):
         subplot.vordering = relation.dependent.ordering
         subplot.vpos_nominal = relation.dependent.type == Type.nominal
         subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
+        subplot.vpos_quantitative = relation.dependent.type == Type.quantitative
+        if subplot.vpos_nominal or subplot.vpos_ordinal:
+            subplot.vpos_coding = relation.determinant.coding
         d = Design(subplots={(0,0): subplot}) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
@@ -100,11 +106,17 @@ class BarChart(ApposedPosition):
             subplot.hordering = relation.determinant.ordering
             subplot.hpos_nominal = relation.determinant.type == Type.nominal
             subplot.hpos_ordinal = relation.determinant.type == Type.ordinal
+            subplot.hpos_quantitative = relation.dependent.type == Type.quantitative
+            if subplot.hpos_nominal or subplot.hpos_ordinal:
+                subplot.hpos_coding = relation.determinant.coding
             subplot.vpos = relation.dependent.name
             subplot.vlabel = relation.dependent.label
             subplot.vordering = relation.dependent.ordering
             subplot.vpos_nominal = relation.dependent.type == Type.nominal
             subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
+            subplot.vpos_quantitative = relation.dependent.type == Type.quantitative
+            if subplot.vpos_nominal or subplot.vpos_ordinal:
+                subplot.vpos_coding = relation.dependent.coding
             d = Design(subplots={(0,0): subplot}) 
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.position)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.length)
@@ -131,8 +143,8 @@ class Color(RetinalList):
                     or (relation.dependent.type == Type.ordinal and len(relation.dependent.domain) < 11))) \
                 or \
                 (isinstance(relation, Set) \
-                and (relation.type == Type.nominal \
-                    or (relation.type == Type.ordinal and len(relation.domain) < 11))):
+                    and (relation.type == Type.nominal \
+                        or (relation.type == Type.ordinal and len(relation.domain) < 11))):
                 return True
         return False
     
@@ -141,7 +153,10 @@ class Color(RetinalList):
         if isinstance(relation, FunctionalDependency):
             d = Design() 
             d.color = relation.dependent.name
+            d.color_nominal = relation.dependent.type == Type.nominal
             d.color_ordinal = relation.dependent.type == Type.ordinal
+            if d.color_nominal or d.color_ordinal:
+                d.color_coding = relation.dependent.coding
             d.cordering = relation.dependent.ordering
             d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
             d.tasks[relation.dependent.name] = (relation.dependent.type, Task.hue)
@@ -149,7 +164,10 @@ class Color(RetinalList):
         if isinstance(relation, Set):
             d = Design() 
             d.color = relation.name
+            d.color_nominal = relation.type == Type.nominal
             d.color_ordinal = relation.type == Type.ordinal
+            if d.color_nominal or d.color_ordinal:
+                d.color_coding = relation.coding
             d.cordering = relation.ordering
             d.tasks[relation.name] = (relation.type, Task.hue)
             return d
