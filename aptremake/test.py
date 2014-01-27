@@ -1,5 +1,5 @@
 
-from metadata import read_metadata
+from metadata import read_metadata, View
 from apt import generate_presentation
 
 def run_all_tests():
@@ -109,10 +109,12 @@ def test_fdnq_fdnq_fdnq():
 def test_columns(keys):
     metadata = read_test_metadata()
     db = metadata["database"]
+    table = metadata["table"]
     relations = [metadata["relations"][k] for k in keys]
-    query = construct_test_query(relations)
-    labels = [r.name for r in relations]
-    visualization_generator = generate_presentation(db, relations, query, labels)
+    query = construct_test_query(relations, table)
+    keys = [r.name for r in relations]
+    view = View(relations, db, query, keys) 
+    visualization_generator = generate_presentation(view)
     for visualization in visualization_generator:
         print_visualization_type(visualization)
 
@@ -140,17 +142,17 @@ def print_visualization_type(visualization):
         print "\tuncategorized"
 
 def read_test_metadata():
-    car_metadata = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars.spec"
+    car_metadata = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars_coded.spec"
     return read_metadata(car_metadata) 
 
-def construct_test_query(relations):
+def construct_test_query(relations, table):
     r = relations[0]
     if len(relations) == 1:
-        columns = tuple([r.determinant.name, r.dependent.name])
+        columns = [r.determinant.name, r.dependent.name]
     else:
-        columns = tuple([r.determinant.name] + [r.dependent.name for r in relations])
+        columns = [r.determinant.name] + [r.dependent.name for r in relations]
     blanks = ", ".join(["%s"]*len(columns))
-    return " ".join(["SELECT APTREMAKEID,", blanks, "FROM cars"]) % columns 
+    return " ".join(["SELECT APTREMAKEID,", blanks, "FROM %s"]) % tuple(columns + [table]) 
 
 def uses_color(design):
     return design["hasColor"]

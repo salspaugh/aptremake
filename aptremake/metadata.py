@@ -2,7 +2,17 @@
 import json
 from sqlite3 import connect
 
-store = {}
+class View(object):
+
+    def __init__(self, relations, database, query, keys):
+        if not hasattr(relations, "__iter__"):
+            raise AttributeError("Metadata argument must be iterable.")
+        if not all([isinstance(d, Relation) for d in relations]):
+            raise AttributeError("Metadata argument list must only contain Relation objects.")
+        self.relations = relations
+        self.database = database
+        self.query = query
+        self.keys = keys
 
 class Type(object):
 
@@ -17,6 +27,8 @@ class Relation(object):
         self.name = name
         self.selected = False # FIXME: These attributes are tied to the
         self.importance = -1 # visualization rendering and probably shouldn't be here.
+        self.label = name
+        self.coding = None
 
 class Set(Relation):
     
@@ -25,7 +37,7 @@ class Set(Relation):
         self.type = None
         self.domain = None
         self.ordering = None 
-        self.determinant = self # This is kludgy.
+        self.determinant = self # FIXME: This is kludgy.
         self.dependent = self 
         Relation.__init__(self, name=name)
 
@@ -82,13 +94,16 @@ def read_metadata(specfilename):
     with open(specfilename) as specfile:
         spec = json.load(specfile)
         metadata["database"] = spec["database"]
+        metadata["table"] = spec["table"]
         metadata["relations"] = {}
         for s in spec["relations"]:
             d = classes[s["class"]](name=s["name"])
             d.type = s.get("type", None)
             d.domain = s.get("domain", None)
             d.ordering = s.get("ordering", None)
-            d.arity = s["arity"]
+            d.arity = s.get("arity", None)
+            d.label = s.get("label", None)
+            d.coding = s.get("coding", None)
             metadata["relations"][s["name"]] = d
         for s in spec["relations"]:
             if s["class"] == "FunctionalDependency":
@@ -97,9 +112,9 @@ def read_metadata(specfilename):
                 d.dependent = metadata["relations"][s["dependent"]]
     return metadata
 
-def load(database, query, labels):
-    db = connect(database)
-    cursor = db.execute(query)
-    data = [dict(zip(labels, tup)) for tup in cursor.fetchall()]
+def load(view):
+    db = connect(view.database)
+    cursor = db.execute(view.query)
+    data = [dict(zip(view.keys, values)) for values in cursor.fetchall()]
     db.close()
     return data

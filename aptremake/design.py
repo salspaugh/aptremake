@@ -52,34 +52,43 @@ class Subplot(object):
         self.haxis = False
         self.marks = marks
         self.hpos = None
+        self.hpos_coding = None
         self.hpos_nominal = False
         self.hpos_ordinal = False
+        self.hpos_quantitative = False
         self.hordering = None
         self.hlabel = ""
         self.vaxis = False
         self.vpos = None
+        self.vpos_coding = None
         self.vpos_nominal = False
         self.vpos_ordinal = False
+        self.vpos_quantitative = False
         self.vordering = None
         self.vlabel = ""
 
     def __repr__(self):
         s = "HAXIS: " + str(self.hpos) + "; VAXIS: " + str(self.vpos)
         return s
-
+    
+    # TODO: Remove unnecessary deepcopy operations.
     def copy_haxis(self, design):
         self.haxis = deepcopy(design.haxis)
         self.hpos = deepcopy(design.hpos)
+        self.hpos_coding = deepcopy(design.hpos_coding)
         self.hpos_nominal = deepcopy(design.hpos_nominal)
         self.hpos_ordinal = deepcopy(design.hpos_ordinal)
+        self.hpos_quantitative = deepcopy(design.hpos_quantitative)
         self.hordering = deepcopy(design.hordering)
         self.hlabel = deepcopy(design.hlabel)
     
     def copy_vaxis(self, design):
         self.vaxis = deepcopy(design.vaxis)
         self.vpos = deepcopy(design.vpos)
+        self.vpos_coding = deepcopy(design.vpos_coding)
         self.vpos_nominal = deepcopy(design.vpos_nominal)
         self.vpos_ordinal = deepcopy(design.vpos_ordinal)
+        self.vpos_quantitative = deepcopy(design.vpos_quantitative) 
         self.vordering = deepcopy(design.vordering)
         self.vlabel = deepcopy(design.vlabel)
 
@@ -93,13 +102,17 @@ class Subplot(object):
             "markClass": self.marks.markclass,
             "markTag": self.marks.marktag,
             "hpos": self.hpos,
-            "hpos_nominal": self.hpos_nominal,
-            "hpos_ordinal": self.hpos_ordinal,
+            "hposCoding": self.hpos_coding,
+            "hposNominal": self.hpos_nominal,
+            "hposOrdinal": self.hpos_ordinal,
+            "hposQuantitative": self.hpos_quantitative,
             "hordering": self.hordering,
             "hlabel": self.hlabel,
             "vpos": self.vpos,
-            "vpos_nominal": self.vpos_nominal,
-            "vpos_ordinal": self.vpos_ordinal,
+            "vposCoding": self.vpos_coding,
+            "vposNominal": self.vpos_nominal,
+            "vposOrdinal": self.vpos_ordinal,
+            "vposQuantitative": self.vpos_quantitative,
             "vordering": self.vordering,
             "vlabel": self.vlabel
         }
@@ -120,24 +133,30 @@ class Design(object):
             self.vaxes = dict([(s.cidx, s.vpos) for s in self.subplots.itervalues()])
         self.tasks = OrderedDict()
         self.color = None
+        self.color_coding = None
+        self.color_nominal = False
         self.color_ordinal = False
         self.cordering = None
 
     def copy_color(self, design):
         self.color = deepcopy(design.color)
+        self.color_coding = deepcopy(design.color_coding)
+        self.color_nominal = deepcopy(design.color_nominal)
         self.color_ordinal = deepcopy(design.color_ordinal)
         self.cordering = deepcopy(design.cordering)
 
-    def render(self, database, query, labels):
+    def render(self, view):
         return {
             "nrows": self.nrows,
             "ncols": self.ncols,
             "hasColor": bool(self.color),
             "color": self.color,
-            "color_ordinal": self.color_ordinal,
+            "colorCoding": self.color_coding,
+            "colorNominal": self.color_nominal,
+            "colorOrdinal": self.color_ordinal,
             "cordering": self.cordering,
             "subplots": [s.render() for s in self.subplots.itervalues()],
-            "data": load(database, query, labels)
+            "data": load(view)
         }
 
     def __repr__(self): # TODO: Fix these to be consistent with Python convention.

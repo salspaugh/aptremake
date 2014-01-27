@@ -15,7 +15,7 @@ function render(plot) {
     if (plot.hasColor) {
       var color = d3.scale.category10();
 
-      if (plot.color_ordinal) {
+      if (plot.colorOrdinal) {
         var colordomain = _.uniq(_.map(plot.data, 
                     function(d) { return d[plot.color] } ));
         colordomain = _.sortBy(colordomain, function(d) { return plot.cordering[d] });
@@ -42,12 +42,17 @@ function render(plot) {
         .attr("height", 18)
         .style("fill", color)
         .style("stroke", "black");
-      legend.append("text")
+      legendText = legend.append("text")
         .attr("x", WIDTH + 74)
         .attr("y", 9)
         .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d; });
+        .style("text-anchor", "end");
+      if (plot.colorCoding) {
+        legendText.text(function(d) { return plot.colorCoding[d]; });
+      } else {
+        legendText.text(function(d) { return d; });
+      }
+
     }
   }
 
@@ -62,9 +67,9 @@ function render(plot) {
       v = _.map(plot.data, function (d) { return d[subplot.vpos]; });
       y.domain([_.min([0, _.min(v)]), _.max(v)]).nice();
       
-      if (subplot.vpos_ordinal || subplot.vpos_nominal) {
+      if (subplot.vposOrdinal || subplot.vposNominal) {
         var vdomain = _.uniq(_.map(plot.data, function(d) { return d[subplot.vpos]; } ));
-        if (subplot.vpos_ordinal) {
+        if (subplot.vposOrdinal) {
           vdomain = _.sortBy(vdomain, function(d) { return subplot.vordering[d]; });
         }
         var y = d3.scale.ordinal()
@@ -74,12 +79,32 @@ function render(plot) {
 
       var yAxis = d3.svg.axis()
         .scale(y)
-        .orient("left")
-        .ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
-       
-      subplotContainer.append("g")
+        .orient("left");
+      yAxis.ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
+
+      if (subplot.vposQuantitative) {  
+        yAxis.ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
+      }
+
+      yAxisCall = subplotContainer.append("g")
         .attr("class", "y axis")
         .call(yAxis);
+
+      if (subplot.vposCoding && (subplot.vposNominal || subplot.vposOrdinal)) {
+        // codedTicks = yAxis.tickValues(); // This only works when tickValues()
+        // has already been used to set tick values. TODO: Submit pull request to d3.
+        codedTicks = []
+        yAxisCall.selectAll(".tick")
+          .selectAll("text")
+          .each(function(d) { codedTicks.push(d); });
+        console.log("Vertical label coding map:", subplot.hposCoding);
+        console.log("Vertical tick codes:", codedTicks);
+        labeledTicks = _.map(codedTicks, function(item) { return subplot.vposCoding[item]; });
+        console.log("Vertical tick labels:", labeledTicks);
+        yAxis.tickValues(labeledTicks);
+      }
+      
+      yAxisCall.call(yAxis); // This is necessary to reset the axis tick labels.
 
       if (leftmost) {
         subplotContainer.append("text")
@@ -131,9 +156,9 @@ function render(plot) {
       h = _.map(plot.data, function (d) { return d[subplot.hpos]; });
       x.domain([_.min([0, _.min(h)]), _.max(h)]).nice();
       
-      if (subplot.hpos_ordinal || subplot.hpos_nominal) {
+      if (subplot.hposOrdinal || subplot.hposNominal) {
         var hdomain = _.uniq(_.map(plot.data, function(d) { return d[subplot.hpos] } ));
-        if (subplot.hpos_ordinal) {
+        if (subplot.hposOrdinal) {
           hdomain = _.sortBy(hdomain, function(d) { return subplot.hordering[d] });
         }
         var x = d3.scale.ordinal()
@@ -143,13 +168,34 @@ function render(plot) {
 
       var xAxis = d3.svg.axis()
         .scale(x)
-        .orient("bottom")
-        .ticks(NUM_TICKS); 
+        .orient("bottom");
+      xAxis.ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
+      
+      if (subplot.hposQuantitative) {  
+        xAxis.ticks(NUM_TICKS); // FIXME: Maybe this shouldn't be hard-coded.
+      }
       
       var xAxisCall = subplotContainer.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
+      
+      if (subplot.hposCoding && (subplot.hposNominal || subplot.hposOrdinal)) {
+        // codedTicks = xAxis.tickValues(); // This only works when tickValues()
+        // has already been used to set tick values. TODO: Submit pull request to d3.
+        codedTicks = []
+        xAxisCall.selectAll(".tick")
+          .selectAll("text")
+          .each(function(d) { codedTicks.push(d); });
+        console.log("Horizontal label coding map:", subplot.hposCoding);
+        console.log("Horizontal tick codes:", codedTicks);
+        labeledTicks = _.map(codedTicks, function(item) { return subplot.hposCoding[item]; });
+        console.log("Horizontal tick labels:", labeledTicks);
+        xAxis.tickValues(labeledTicks);
+      }
+
+      xAxisCall.call(xAxis); // This is necessary to reset the axis tick labels.
+      
       xAxisCall.selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
@@ -218,11 +264,6 @@ function render(plot) {
     var width = +subplotContainer.attr("width") - MARGIN.LEFT - MARGIN.RIGHT;
     var height = +subplotContainer.attr("height") - MARGIN.TOP - MARGIN.BOTTOM;
 
-    //subplotContainer.append("rect") // FIXME: Remove after debugging
-    //  .attr("width", width)
-    //  .attr("height", height)
-    //  .attr("fill", "pink");
-
     console.log("Subplot", subplot);
     marks = drawMarks(subplot, subplotContainer);
     drawHorizontalAxis(marks, subplot, subplotContainer, width, height, bottommost);
@@ -260,10 +301,6 @@ function render(plot) {
     var outer = d3.select("#presentation");
     outer.attr("width", WIDTH_PLUS)
       .attr("height", HEIGHT);
-    //outer.append("rect") // FIXME: Remove after debugging
-    //  .attr("width", WIDTH)
-    //  .attr("height", HEIGHT)
-    //  .attr("fill", "#acb1d3");
     return outer;
   }
 

@@ -2,11 +2,11 @@
 from metadata import read_metadata, validate, Relation
 from plantree import RootNode, PresentationTreeNode
 
-def generate_presentation(database, metadata, query, labels, limit=5):
-    for relation in metadata:
+def generate_presentation(view, limit=5):
+    for relation in view.relations:
         validate(relation)
     count = 0
-    plan = RootNode(database, metadata, query, labels)
+    plan = RootNode(view)
     stack = [plan]
     while len(stack) > 0:
         node = stack.pop(0)
