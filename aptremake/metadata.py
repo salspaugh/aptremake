@@ -4,7 +4,7 @@ from sqlite3 import connect
 
 class View(object):
 
-    def __init__(self, relations, database, query, keys):
+    def __init__(self, relations, database, query, query_params, keys):
         if not hasattr(relations, "__iter__"):
             raise AttributeError("Relations must be iterable.")
         if not all([isinstance(d, Relation) for d in relations]):
@@ -12,6 +12,7 @@ class View(object):
         self.relations = relations
         self.database = database
         self.query = query
+        self.query_params = query_params
         self.keys = keys
 
 class Type(object):
@@ -114,7 +115,7 @@ def read_metadata(specfilename):
 
 def load(view):
     db = connect(view.database)
-    cursor = db.execute(view.query)
+    cursor = db.execute(view.query, view.query_params)
     rows = cursor.fetchall()
     data = [dict(zip(view.keys, values)) for values in rows]
     db.close()
