@@ -6,9 +6,9 @@ class View(object):
 
     def __init__(self, relations, database, query, keys):
         if not hasattr(relations, "__iter__"):
-            raise AttributeError("Metadata argument must be iterable.")
+            raise AttributeError("Relations must be iterable.")
         if not all([isinstance(d, Relation) for d in relations]):
-            raise AttributeError("Metadata argument list must only contain Relation objects.")
+            raise AttributeError("Relations list must only contain Relation objects.")
         self.relations = relations
         self.database = database
         self.query = query
@@ -115,6 +115,7 @@ def read_metadata(specfilename):
 def load(view):
     db = connect(view.database)
     cursor = db.execute(view.query)
-    data = [dict(zip(view.keys, values)) for values in cursor.fetchall()]
+    rows = cursor.fetchall()
+    data = [dict(zip(view.keys, values)) for values in rows]
     db.close()
     return data
