@@ -11,6 +11,9 @@ Currently the only "languages" supported are:
 * BarChart
 * Color
 
+This means that bar charts and scatter plots can be generated.
+Currently there is no support for mark labels.
+
 ## How to run aptremake
 
 On the command line, type:
