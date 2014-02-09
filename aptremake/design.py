@@ -101,20 +101,24 @@ class Subplot(object):
             "markType": self.marks.marktype,
             "markClass": self.marks.markclass,
             "markTag": self.marks.marktag,
-            "hpos": self.hpos,
-            "hposCoding": self.hpos_coding,
-            "hposNominal": self.hpos_nominal,
-            "hposOrdinal": self.hpos_ordinal,
-            "hposQuantitative": self.hpos_quantitative,
-            "hordering": self.hordering,
-            "hlabel": self.hlabel,
-            "vpos": self.vpos,
-            "vposCoding": self.vpos_coding,
-            "vposNominal": self.vpos_nominal,
-            "vposOrdinal": self.vpos_ordinal,
-            "vposQuantitative": self.vpos_quantitative,
-            "vordering": self.vordering,
-            "vlabel": self.vlabel
+            "haxis": {
+                "pos": self.hpos,
+                "coding": self.hpos_coding,
+                "nominal": self.hpos_nominal,
+                "ordinal": self.hpos_ordinal,
+                "quantitative": self.hpos_quantitative,
+                "ordering": self.hordering,
+                "label": self.hlabel,
+            },
+            "vaxis": {
+                "pos": self.vpos,
+                "coding": self.vpos_coding,
+                "nominal": self.vpos_nominal,
+                "ordinal": self.vpos_ordinal,
+                "quantitative": self.vpos_quantitative,
+                "ordering": self.vordering,
+                "label": self.vlabel
+            }
         }
 
 class Design(object):
