@@ -12,7 +12,7 @@ apt = {
     var HEIGHT = 650; 
     var NUM_TICKS = 5;
     var TEXT_PADDING = 20;
-    var TICK_AXIS_SPACE = 20;
+    var TICK_AXIS_SPACE = 40;
     var TOP_MARGIN = 10;
 
     function drawColor(outerContainer, margin) {
@@ -119,6 +119,7 @@ apt = {
         transformation += (" " + rotation)
       }
       var text = container.append("text")
+        .attr("class", "axis label")
         .attr("text-anchor", "middle")
         .attr("transform", transformation)
         .text(label);
@@ -335,14 +336,15 @@ apt = {
         if (subplot[hasAxis]) {
           return subplot[axis].label;
         } else {
-          return "";
+          return null;
         }
       });
+      labels = _.filter(labels, function(d) { return d; });
       var maxAxisLabelHeight = _.max(_.map(labels, function(label) {
         label = label + "";
         return computeDisplayedAxisLabelHeight(label, plotLength, svgContainer);
       }));
-      return maxAxisLabelHeight;
+      return _.max([0, maxAxisLabelHeight]);
     }
 
 
@@ -369,13 +371,14 @@ apt = {
         }
         return "";
       }));
+      labels = _.filter(labels, function(d) { return d; });
       var maxTickLabelLenth = _.max(_.map(labels, function(label) {
         // TODO: FIXME: Temporary hack. Need to get actual tick labels.
         tickLabel = (label + "").split(".")[0]; 
         displayedLength = computeDisplayedTextLength(container, tickLabel);
         return displayedLength;
       }));
-      return maxTickLabelLenth;
+      return _.max([0, maxTickLabelLenth]);
     }
 
 
