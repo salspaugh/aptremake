@@ -22,14 +22,14 @@ def design():
         selection_data = json.loads(request.form["relations"])
         apt_input = sorted(selection_data, key=lambda x: int(x["importance"]))
         apt_input = [metadata["relations"][s["name"]] for s in apt_input]
-        query = construct_test_query(apt_input, table) 
+        query, query_params = construct_test_query(apt_input, table) 
         if len(apt_input) == 1:
             r = apt_input[0]
             labels = ["APTREMAKEID"] + [r.determinant.name, r.dependent.name]
         else:    
             r = apt_input[0]
             labels = ["APTREMAKEID", r.determinant.name] + [r.dependent.name for r in apt_input]
-        view = View(apt_input, db, query, labels)
+        view = View(apt_input, db, query, query_params, labels)
         try:
             design = generate_presentation(view, limit=1).next()
         except StopIteration: # nothing generated

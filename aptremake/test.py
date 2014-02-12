@@ -152,7 +152,7 @@ def construct_test_query(relations, table):
     else:
         columns = [r.determinant.name] + [r.dependent.name for r in relations]
     blanks = ", ".join(["%s"]*len(columns))
-    return " ".join(["SELECT APTREMAKEID,", blanks, "FROM %s"]) % tuple(columns + [table]) 
+    return " ".join(["SELECT APTREMAKEID,", blanks, "FROM %s"]) % tuple(columns + [table]), [] 
 
 def uses_color(design):
     return design["hasColor"]
