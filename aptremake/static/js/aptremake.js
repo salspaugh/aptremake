@@ -30,7 +30,6 @@ apt = {
         }
         
         d3.selectAll(".mark")
-          .style("stroke", "black")
           .style("fill", function(d) { return color(d[plot.color]); });
 
         var legend = outerContainer.selectAll(".legend")
@@ -43,7 +42,6 @@ apt = {
           .attr("width", 18)
           .attr("height", 18)
           .style("fill", color)
-          .style("stroke", "black");
         legendText = legend.append("text")
           .attr("x", WIDTH + 74)
           .attr("y", 9)
@@ -81,28 +79,69 @@ apt = {
     }
 
 
-    function applyAxisLabel(plotLength, sidemost, subplotContainer, horizontalOffset, verticalOffset, rotation, label, horizontal) {
-      if (sidemost) {
-        var text = subplotContainer.append("text")
-          .attr("text-anchor", "middle")
-          .attr("transform", "translate(" + horizontalOffset + ", " + verticalOffset + ")" + rotation)
-          .text(label);
-        var textDisplayLength = text[0][0].getBBox().width; // FIXME: There has to be a less hacky way to do this.
-        var textDisplayHeight = text[0][0].getBBox().height;
-        if (textDisplayLength > plotLength) {
-          text.remove(); // Delete the label that's too long.
-          var charLength = textDisplayLength / label.length; 
-          var charsPerLine = Math.floor(plotLength / charLength);
-          for (i = 0; i < label.length; i+=charsPerLine) {
-            subplotContainer.append("text")
-              .attr("text-anchor", "middle")
-              .attr("transform", "translate(" + horizontalOffset + ", " + verticalOffset + ")" + rotation)
-              .text(label.slice(i,i+charsPerLine)); 
-            if (horizontal) {
-              verticalOffset += textDisplayHeight;
-            } else {
-              horizontalOffset += textDisplayHeight;
-            }
+    function wrapAxisLabel(label, displayedLength, desiredLength) {
+      var wrappedLabel = [];
+      var charLength = displayedLength / label.length; 
+      var charsPerLine = Math.floor(desiredLength / charLength);
+      
+      var i = 0;
+      while (i < label.length) {
+        var nextSegment = label.slice(i, i + charsPerLine);
+        if (i + charsPerLine >= label.length) {
+          wrappedLabel.push(nextSegment);
+          i += charsPerLine;
+          continue;
+        }
+        var spaceIdx = nextSegment.lastIndexOf(" ");
+        if (spaceIdx < 0) {
+          var lineToDisplay = label.slice(i, i + charsPerLine - 1) + "-";
+          wrappedLabel.push(lineToDisplay);
+          i += charsPerLine - 1;
+        } else {
+          var lineToDisplay = label.slice(i, i + spaceIdx);
+          wrappedLabel.push(lineToDisplay);
+          i += spaceIdx + 1;
+        }
+      }
+      return wrappedLabel;
+    }
+
+
+    function applyAxisLabel(label, container, offset, rotation) {
+      var transformation = "translate("
+      if (offset && offset.horizontal && offset.vertical) {
+        transformation += offset.horizontal + ", " + offset.vertical 
+      } else {
+        transformation += "0, 0"
+      }
+      transformation += ")"
+      if (rotation) {
+        transformation += (" " + rotation)
+      }
+      var text = container.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", transformation)
+        .text(label);
+      return text;
+    }
+
+
+    function wrapAndApplyAxisLabel(plotLength, container, offset, rotation, label, horizontal) {
+      var text = applyAxisLabel(label, container, offset, rotation);
+
+      // FIXME: Find less hacky way to do this.
+      var textDisplayLength = text[0][0].getBBox().width; 
+      var textDisplayHeight = text[0][0].getBBox().height;
+
+      if (textDisplayLength > plotLength) {
+        text.remove(); // Delete the label that's too long.
+        wrappedLabel = wrapAxisLabel(label, textDisplayLength, plotLength);
+        for (var i = 0; i < wrappedLabel.length; i++) {
+          applyAxisLabel(wrappedLabel[i], container, offset, rotation);
+          if (horizontal) {
+            offset.vertical += textDisplayHeight;
+          } else {
+            offset.horizontal += textDisplayHeight;
           }
         }
       }
@@ -125,16 +164,16 @@ apt = {
         .call(axis);
 
       if (axisData.coding && (axisData.nominal || axisData.ordinal)) {
-        // codedTicks = axis.tickValues(); // This only works when tickValues()
-        // has already been used to set tick values. TODO: Submit pull request to d3?
+        // codedTicks = axis.tickValues(); 
+        // NOTE: This only works when tickValues() has already been used to
+        // set tick values. Submit pull request to d3?
         codedTicks = [];
         axisCall.selectAll(".tick")
           .selectAll("text")
           .each(function(d) { codedTicks.push(d); });
-        console.log("Label coding map:", axisData.coding);
-        console.log("Tick codes:", codedTicks);
-        labeledTicks = _.map(codedTicks, function(item) { return axisData.coding[item]; });
-        console.log("Tick labels:", labeledTicks);
+        labeledTicks = _.map(codedTicks, function(item) { 
+          return axisData.coding[item]; 
+        });
         axis.tickValues(labeledTicks);
       }
       
@@ -142,10 +181,10 @@ apt = {
 
       if (rotate) {
         axisCall.selectAll("text")  
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", "-.5em") // TODO: FIXME: Why are these hard-coded?
-            .attr("transform", function(d) { return "rotate(-90)" });
+            .style("text-anchor", "start")
+            .attr("dx", ".5em")
+            .attr("dy", ".5em") // TODO: FIXME: Why are these hard-coded?
+            .attr("transform", function(d) { return "rotate(45)" });
       }
 
     }
@@ -156,17 +195,24 @@ apt = {
       var s = d3.scale.linear()
         .range([rangeStart, rangeEnd]);
       
-      // TODO: Figure out why this isn't working like it was before, or if it was:
-      //s.domain(d3.extent(plot.data, function(d) { return d[position]; })).nice();
-      positionData = _.map(plot.data, function (d) { return d[axisData.pos]; });
+      // TODO: Figure out why this isn't working like it was before:
+      // s.domain(d3.extent(plot.data, function(d) { return d[position]; })).nice();
+      positionData = _.map(plot.data, function (d) { 
+        return d[axisData.pos]; 
+      });
       s.domain([_.min([0, _.min(positionData)]), _.max(positionData)]).nice();
       
       if (axisData.ordinal || axisData.nominal) {
-        var scaleDomain = _.uniq(_.map(plot.data, function(d) { return d[axisData.pos]; } ));
+        var scaleDomain = _.uniq(_.map(plot.data, function(d) { 
+          return d[axisData.pos]; 
+        }));
         if (axisData.ordinal) {
-          scaleDomain = _.sortBy(scaleDomain, function(d) { return axisData.ordering[d]; });
+          scaleDomain = _.sortBy(scaleDomain, function(d) { 
+            return axisData.ordering[d];
+          });
         }
-        if (usesPoints) { // TODO: Figure out why passing in range function doesn't work.
+        if (usesPoints) { 
+          // TODO: Figure out why passing in range function doesn't work.
           var s = d3.scale.ordinal()
             .rangePoints([rangeStart, rangeEnd], rangeWidth)
             .domain(scaleDomain);
@@ -186,7 +232,14 @@ apt = {
 
         var y = createScale(subplot.vaxis, height, 0, true, 1);
         createAxis(subplot.vaxis, y, "left", subplotContainer, "y axis", 0, false);
-        applyAxisLabel(height - margin.top, leftmost, subplotContainer, -1*margin.left+TEXT_PADDING, (height/2), "rotate(-90)", subplot.vaxis.label, false);   
+
+        var offset = {
+          "horizontal": -1*margin.left+TEXT_PADDING,
+          "vertical": (height/2)
+        };
+        if (leftmost) {
+          wrapAndApplyAxisLabel(height - margin.top, subplotContainer, offset, "rotate(-90)", subplot.vaxis.label, false);
+        }  
         
         if (subplot.markType == "point") {
           marks.attr("cy", function(d) { return y(d[subplot.vaxis.pos]); });
@@ -206,7 +259,14 @@ apt = {
         
         var x = createScale(subplot.haxis, 0, width, false, .1);
         createAxis(subplot.haxis, x, "bottom", subplotContainer, "x axis", height, true);
-        applyAxisLabel(width, bottommost, subplotContainer, width/2, height - (-1*margin.bottom+TEXT_PADDING), "", subplot.haxis.label, true);
+
+        var offset = {
+          "horizontal": width/2,
+          "vertical": height - (-1*margin.bottom+TEXT_PADDING)
+        };
+        if (bottommost) {
+          wrapAndApplyAxisLabel(width, subplotContainer, offset, "", subplot.haxis.label, true);
+        }
         
         if (subplot.markType == "point") {
           marks.attr("cx", function(d) { return x(d[subplot.haxis.pos]); });
@@ -224,11 +284,12 @@ apt = {
 
 
     function drawMarks(subplot, subplotContainer) {
+      // TODO: FIXME: `id` is currently hard-coded and should not be.
       var marks = subplotContainer.selectAll(subplot.markClass)
         .data(plot.data)
         .enter().append(subplot.markTag)
         .attr("class", function(d) { return subplot.markClass + " mark"; })
-        .attr("id", function(d) { return "mark_" + d.APTREMAKEID; })
+        .attr("id", function(d) { return "mark_" + d.APTREMAKEID; }) // FIXME
         .attr("cx", function(d) { return d[subplot.haxis.pos]; })
         .attr("cy", function(d) { return d[subplot.vaxis.pos]; });
       if (subplot.markType == "point") {
@@ -259,21 +320,13 @@ apt = {
 
 
     function computeDisplayedAxisLabelHeight(label, plotLength, svgContainer) {
-     var text = svgContainer.append("text")
-        .attr("text-anchor", "middle")
-        .text(label);
-      var textDisplayLength = text[0][0].getBBox().width; // FIXME: There has to be a less hacky way to do this.
+      var text = applyAxisLabel(label, svgContainer, false, "");
+      // FIXME: There has to be a less hacky way to do this.
+      var textDisplayWidth = text[0][0].getBBox().width;
       var textDisplayHeight = text[0][0].getBBox().height;
       text.remove();
-      var height = textDisplayHeight;
-      if (textDisplayLength > plotLength) {
-        var charLength = textDisplayLength / label.length; 
-        var charsPerLine = Math.floor(plotLength / charLength);
-        for (i = 0; i < label.length; i+=charsPerLine) {
-          height += textDisplayHeight;
-        }
-      }
-      return height; 
+      var wrappedLabel = wrapAxisLabel(label, textDisplayWidth, plotLength);
+      return (textDisplayHeight * wrappedLabel.length); 
     }
 
 
@@ -296,7 +349,8 @@ apt = {
     function computeDisplayedTextLength(aContainer, aString) {
       var text = aContainer.append("text")
         .text(aString);
-      var textDisplayLength = text[0][0].getBBox().width; // FIXME: There has to be a less hacky way to do this.
+      // FIXME: There has to be a less hacky way to do this.
+      var textDisplayLength = text[0][0].getBBox().width; 
       text.remove();
       return textDisplayLength;
     }
@@ -308,13 +362,16 @@ apt = {
           if (subplot[axis].coding) {
             return _.values(subplot[axis].coding);
           } else {
-            return _.map(plot.data, function(d) { return d[subplot[axis].pos]; });
+            return _.map(plot.data, function(d) { 
+              return d[subplot[axis].pos];
+            });
           }
         }
         return "";
       }));
       var maxTickLabelLenth = _.max(_.map(labels, function(label) {
-        tickLabel = (label + "").split(".")[0]; // TODO: FIXME: Temporary hack. Need to get actual tick labels.
+        // TODO: FIXME: Temporary hack. Need to get actual tick labels.
+        tickLabel = (label + "").split(".")[0]; 
         displayedLength = computeDisplayedTextLength(container, tickLabel);
         return displayedLength;
       }));
