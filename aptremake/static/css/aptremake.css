@@ -9,10 +9,10 @@ body {
     shape-rendering: crispEdges;
 }
 .dot {
-    fill: #BBB;
+    fill: steelblue;
     stroke: #000;
 }
 .bar {
-    fill: #BBB;
-    stroke: #000;
+    fill: steelblue;
+    stroke: none;
 }

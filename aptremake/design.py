@@ -14,8 +14,8 @@ class Mark(object): # This is a weird way to handle this.
 
     class MarkClass(object):
         
-        dot = ".dot"
-        bar = ".bar"
+        dot = "dot"
+        bar = "bar"
 
     class MarkTag(object):
         
