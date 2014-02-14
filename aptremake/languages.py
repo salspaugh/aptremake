@@ -106,7 +106,7 @@ class BarChart(ApposedPosition):
             subplot.hordering = relation.determinant.ordering
             subplot.hpos_nominal = relation.determinant.type == Type.nominal
             subplot.hpos_ordinal = relation.determinant.type == Type.ordinal
-            subplot.hpos_quantitative = relation.dependent.type == Type.quantitative
+            subplot.hpos_quantitative = relation.determinant.type == Type.quantitative
             if subplot.hpos_nominal or subplot.hpos_ordinal:
                 subplot.hpos_coding = relation.determinant.coding
             subplot.vpos = relation.dependent.name
