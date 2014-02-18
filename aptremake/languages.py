@@ -33,7 +33,7 @@ class HorizontalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        subplot = Subplot(Marks["POINTS"](relation.determinant.name))
+        subplot = Subplot()
         subplot.haxis = True
         subplot.hpos = relation.dependent.name
         subplot.hlabel = relation.dependent.label
@@ -41,8 +41,12 @@ class HorizontalAxis(SinglePosition):
         subplot.hpos_nominal = relation.dependent.type == Type.nominal
         subplot.hpos_ordinal = relation.dependent.type == Type.ordinal
         subplot.hpos_quantitative = relation.dependent.type == Type.quantitative
+        marks = Marks["POINTS"](relation.determinant.name)
         if subplot.hpos_nominal or subplot.hpos_ordinal:
-            subplot.hpos_coding = relation.determinant.coding
+            subplot.hpos_coding = relation.dependent.coding
+        if relation.determinant.type == Type.nominal or relation.determinant.type == Type.ordinal:
+            marks = Marks["POINTS"](relation.determinant.name, relation.determinant.coding)
+        subplot.marks = marks
         d = Design(subplots={(0,0): subplot}) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
@@ -59,7 +63,7 @@ class VerticalAxis(SinglePosition):
 
     @classmethod
     def design(cls, relation):
-        subplot = Subplot(Marks["POINTS"](relation.determinant.name))
+        subplot = Subplot()
         subplot.vaxis = True
         subplot.vpos = relation.dependent.name
         subplot.vlabel = relation.dependent.label
@@ -67,8 +71,12 @@ class VerticalAxis(SinglePosition):
         subplot.vpos_nominal = relation.dependent.type == Type.nominal
         subplot.vpos_ordinal = relation.dependent.type == Type.ordinal
         subplot.vpos_quantitative = relation.dependent.type == Type.quantitative
+        marks = Marks["POINTS"](relation.determinant.name)
         if subplot.vpos_nominal or subplot.vpos_ordinal:
-            subplot.vpos_coding = relation.determinant.coding
+            subplot.vpos_coding = relation.dependent.coding
+        if relation.determinant.type == Type.nominal or relation.determinant.type == Type.ordinal:
+            marks = Marks["POINTS"](relation.determinant.name, relation.determinant.coding)
+        subplot.marks = marks
         d = Design(subplots={(0,0): subplot}) 
         d.tasks[relation.determinant.name] = (relation.determinant.type, Task.mark)
         d.tasks[relation.dependent.name] = (relation.dependent.type, Task.position)
@@ -98,7 +106,8 @@ class BarChart(ApposedPosition):
     @classmethod
     def design(cls, relation): # TODO: Hard-code in when it becomes a sideways bar chart.
         if isinstance(relation, FunctionalDependency):
-            subplot = Subplot(Marks["BARS"](relation.determinant.name))
+            subplot = Subplot()
+            subplot.marks = Marks["BARS"](relation.determinant.name)
             subplot.haxis = True
             subplot.vaxis = True
             subplot.hpos = relation.determinant.name

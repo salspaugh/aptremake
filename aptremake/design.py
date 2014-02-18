@@ -22,11 +22,12 @@ class Mark(object): # This is a weird way to handle this.
         circle = "circle"
         rect = "rect"
 
-    def __init__(self, marktype, markclass, marktag, metadata):
+    def __init__(self, marktype, markclass, marktag, metadata, coding=None):
         self.marktype = marktype
         self.markclass = markclass
         self.marktag = marktag
         self.metadata = metadata
+        self.coding = coding 
 
     def is_scatterplot_mark(self):
         return self.marktype == Mark.MarkType.point
@@ -35,8 +36,8 @@ class Mark(object): # This is a weird way to handle this.
         return self.marktype == Mark.MarkType.bar
 
 def bind_marks(marktype, markclass, marktag):
-    def mark(binding):
-        return Mark(marktype, markclass, marktag, binding)
+    def mark(binding, coding=None):
+        return Mark(marktype, markclass, marktag, binding, coding)
     return mark
 
 Marks = {
@@ -46,11 +47,11 @@ Marks = {
 
 class Subplot(object):
 
-    def __init__(self, marks):
+    def __init__(self):
         self.ridx = 0
         self.cidx = 0
         self.haxis = False
-        self.marks = marks
+        self.marks = None
         self.hpos = None
         self.hpos_coding = None
         self.hpos_nominal = False
@@ -92,7 +93,7 @@ class Subplot(object):
         self.vordering = deepcopy(design.vordering)
         self.vlabel = deepcopy(design.vlabel)
 
-    def render(self):
+    def render(self, label_points=True):
         return {
             "ridx": self.ridx,
             "cidx": self.cidx,
@@ -101,6 +102,8 @@ class Subplot(object):
             "markType": self.marks.marktype,
             "markClass": self.marks.markclass,
             "markTag": self.marks.marktag,
+            "markLabel": self.marks.metadata if label_points else None,
+            "markCoding": self.marks.coding,
             "haxis": {
                 "pos": self.hpos,
                 "coding": self.hpos_coding,
@@ -149,7 +152,7 @@ class Design(object):
         self.color_ordinal = deepcopy(design.color_ordinal)
         self.cordering = deepcopy(design.cordering)
 
-    def render(self, view):
+    def render(self, view, label_points=True):
         return {
             "nrows": self.nrows,
             "ncols": self.ncols,
@@ -159,7 +162,7 @@ class Design(object):
             "colorNominal": self.color_nominal,
             "colorOrdinal": self.color_ordinal,
             "cordering": self.cordering,
-            "subplots": [s.render() for s in self.subplots.itervalues()],
+            "subplots": [s.render(label_points=label_points) for s in self.subplots.itervalues()],
             "caption": view.caption,
             "data": load(view)
         }

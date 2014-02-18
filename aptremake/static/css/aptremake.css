@@ -21,3 +21,7 @@ body {
     fill: steelblue;
     stroke: none;
 }
+
+svg.text {
+	font: 12px sans-serif;
+}

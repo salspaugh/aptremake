@@ -18,8 +18,9 @@ apt = {
         RIGHT_MARGIN = 40, 
         MIN_SUBPLOT_HEIGHT = 250, 
         MIN_SUBPLOT_WIDTH = 250, 
-        CAPTION_HEIGHT = 100;
-
+        CAPTION_HEIGHT = 100
+        LABEL_OFFSET = 8;
+        MAX_NUM_POINTS_FOR_LABELING = 40;
 
     function writeCaption(string, width) {
       d3.select("#main")
@@ -86,7 +87,6 @@ apt = {
       var s = d3.scale.linear()
         .range([rangeStart, rangeEnd])
         .domain([0, 1]);
-      console.log(rangeStart, rangeEnd);  
       var axis = d3.svg.axis()
         .scale(s)
         .orient(orientation)
@@ -96,11 +96,23 @@ apt = {
         .attr("transform", "translate(0," + translation + ")")
         .call(axis);
       if (subplot.markType == "point") {
+        r = Math.random();
         marks.selectAll(subplot.markTag)
-          .attr(locationAttr, function(d) { return s(Math.random()); });
+          .attr(locationAttr, function(d) {
+            d.r = Math.random();
+            return s(d.r); 
+          });
+        marks.selectAll("text")
+          .attr("y", function(d) { return s(d.r) + LABEL_OFFSET; });
       } else if (subplot.markType == "bar") {
         // TODO: This shouldn't happen. Raise an error if it does.
       }
+      var axisSelector = _.map(className.split(" "), function (d) {
+        return "." + d;
+      }).join("");
+      d3.selectAll(axisSelector)
+        .selectAll("path")
+        .style("display", "none");
     }
 
 
@@ -285,7 +297,7 @@ apt = {
           marks.selectAll(subplot.markTag)
             .attr("cy", function(d) { return y(d[subplot.vaxis.pos]); });
           marks.selectAll("text")
-            .attr("dy", function(d) { return "-1em"; });
+            .attr("y", function(d) { return y(d[subplot.vaxis.pos]) + LABEL_OFFSET; });
         } else if (subplot.markType == "bar") {
           marks.selectAll(subplot.markTag)
             .attr("y", function(d) { return y(d[subplot.vaxis.pos]); })
@@ -300,7 +312,8 @@ apt = {
 
     function drawHorizontalAxis(marks, subplot, subplotContainer, bottommost, margin) {
       var width = +subplotContainer.attr("width") - margin.left - margin.right,
-          height = +subplotContainer.attr("height") - margin.top - margin.bottom;
+          height = +subplotContainer.attr("height") - margin.top - margin.bottom,
+          rotate = !subplot.haxis.quantitative;
 
       if (subplot.hasHaxis) {
 
@@ -312,7 +325,7 @@ apt = {
               "vertical": height + margin.bottom - axisLabelHeight
             };
 
-        createAxis(subplot.haxis, x, "bottom", subplotContainer, "x axis", height, true);
+        createAxis(subplot.haxis, x, "bottom", subplotContainer, "x axis", height, rotate);
         if (bottommost) {
           wrapAndApplyAxisLabel(width, subplotContainer, offset, "", subplot.haxis.label, true);
         }
@@ -321,7 +334,7 @@ apt = {
           marks.selectAll(subplot.markTag)
             .attr("cx", function(d) { return x(d[subplot.haxis.pos]); });
           marks.selectAll("text")
-            .attr("dx", function(d) { return "-1em"; });
+            .attr("x", function(d) { return x(d[subplot.haxis.pos]) + LABEL_OFFSET; });
         }
         else if (subplot.markType == "bar") {
           // TODO: FIXME: rangeBand only works if x is ordinal, insert safety check
@@ -346,22 +359,18 @@ apt = {
         .attr("id", function(d) { return "mark_" + d.APTREMAKEID; }) // FIXME
         .attr("cx", function(d) { return d[subplot.haxis.pos]; })
         .attr("cy", function(d) { return d[subplot.vaxis.pos]; });
-      // var node = subplotContainer.selectAll("g")
-      //   .data(plot.data)
-      //   .enter().append("g");
-      // var marks = node.append(subplot.markTag)
-      //   .attr("class", function(d) { return subplot.markClass + " mark"; })
-      //   .attr("id", function(d) { return "mark_" + d.APTREMAKEID; }) // FIXME
-      //   .attr("cx", function(d) { return d[subplot.haxis.pos]; })
-      //   .attr("cy", function(d) { return d[subplot.vaxis.pos]; });
-      // nodes.append("text")
-      //   .attr("x", function(d) { return x(d.x); })
-      //   .attr("y", function(d) { return y(d.y); })
-      //   .text("foo");
       if (subplot.markType == "point") {
         marks.attr("r", 5);
-        marks.append("text")
-            .text("foo");
+        if (plot.data.length < MAX_NUM_POINTS_FOR_LABELING) {
+          groups.append("text")
+              .text(function(d) {
+                if (subplot.markCoding) {
+                  return subplot.markCoding[d[subplot.markLabel]]; 
+                } else {
+                  return d[subplot.markLabel];
+                }
+              });
+        }
       }
       return groups;
     }
