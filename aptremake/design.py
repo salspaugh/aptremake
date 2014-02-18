@@ -160,6 +160,7 @@ class Design(object):
             "colorOrdinal": self.color_ordinal,
             "cordering": self.cordering,
             "subplots": [s.render() for s in self.subplots.itervalues()],
+            "caption": view.caption,
             "data": load(view)
         }
 

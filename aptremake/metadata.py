@@ -5,7 +5,7 @@ from sqlite3 import connect
 class View(object):
 
     def __init__(self, relations, database, query, query_params,
-                 keys, raw_features=None):
+                 keys, raw_features=None, caption=""):
         if not hasattr(relations, "__iter__"):
             raise AttributeError("Relations must be iterable.")
         if not all([isinstance(d, Relation) for d in relations]):
@@ -16,6 +16,7 @@ class View(object):
         self.query_params = query_params
         self.keys = keys
         self.raw_features = raw_features
+        self.caption = caption
 
 class Type(object):
 
