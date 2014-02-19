@@ -137,9 +137,13 @@ class CompositionTreeNode(PlanTreeNode):
         PlanTreeNode.__init__(self)
 
     def generate_children(self):
-        presentation = self.design.render(self.view)
+        presentation = self.design.render(self.view, label_points=True)
         p = PresentationTreeNode(presentation)
         self.add_child(p)
+        if all([s["markCoding"] for s in presentation["subplots"]]):
+            presentation = self.design.render(self.view, label_points=False)
+            p = PresentationTreeNode(presentation)
+            self.add_child(p)
 
     def __repr__(self):
         return " ".join(["COMPOSITION:", str(self.design)])

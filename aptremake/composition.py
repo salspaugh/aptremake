@@ -85,7 +85,8 @@ def merge_compatible_axes(designa, designb):
     new_design.vaxes = (deepcopy(designa.vaxes) if len(designb.vaxes) == 0 else deepcopy(designb.vaxes))
     for (idx, subplota) in designa.subplots.iteritems():
         subplotb = designb.subplots[idx]
-        new_subplot = Subplot(deepcopy(subplota.marks))
+        new_subplot = Subplot()
+        new_subplot.marks = deepcopy(subplota.marks)
         new_subplot.copy_haxis(subplota) if subplota.haxis else new_subplot.copy_haxis(subplotb) 
         new_subplot.copy_vaxis(subplota) if subplota.vaxis else new_subplot.copy_vaxis(subplotb) 
         new_design.subplots[idx] = new_subplot
