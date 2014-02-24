@@ -7,6 +7,10 @@ from logging import basicConfig, debug, DEBUG
 basicConfig(filename='aptremake.log', level=DEBUG)
 
 def compose(designs):
+    c = composer(designs)
+    return c if c and not retinal_encodings_redundant(c) else None
+
+def composer(designs):
     # TODO: Verify that designs is a list of designs.
     debug("--------------------------------------------------------------------")
     debug("COMPOSING:")
@@ -20,7 +24,7 @@ def compose(designs):
         return _compose(designs[0], designs[1])
     if len(designs) > 2:
         design = _compose(designs[0], designs[1])
-        return compose([design] + designs[2:]) if design else None
+        return composer([design] + designs[2:]) if design else None
 
 def _compose(designa, designb): # TODO: Document pre-conditions for functions
     if retinal_encodings_conflict(designa, designb):
@@ -38,8 +42,14 @@ def _compose(designa, designb): # TODO: Document pre-conditions for functions
     if axes_compatible(designa, designb):
         return merge_compatible_axes(designa, designb)
 
+def retinal_encodings_redundant(design):
+    redundant_color = any([
+        a == design.color for a in design.haxes.values() + design.vaxes.values()]) 
+    return redundant_color
+
 def retinal_encodings_conflict(designa, designb):
-    return (designa.color and designb.color and designa.color != designb.color)
+    mismatching_color = (designa.color and designb.color and designa.color != designb.color)
+    return mismatching_color
 
 def has_haxes(design):
     return any([s.haxis for s in design.subplots.itervalues()])

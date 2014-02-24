@@ -3,14 +3,14 @@
 apt = {
 
 
-  render: function(plot) {
+  render: function(plot, svgPlotID, divCaptionID) {
     console.log("Rendering:", plot);
      
     // Important constants
-    var WIDTH = 500,  
-        LEGEND_SPACE = 150, 
-        HEIGHT = 500,  
-        NUM_TICKS = 5, 
+    var WIDTH = 500,
+        LEGEND_SPACE = 150,
+        HEIGHT = 500,
+        NUM_TICKS = 5,
         BORDER_PADDING = 10,  
         VERTICAL_TICK_AXIS_PADDING = 40, 
         HORIZONTAL_TICK_AXIS_PADDING = 40, 
@@ -18,16 +18,11 @@ apt = {
         RIGHT_MARGIN = 40, 
         MIN_SUBPLOT_HEIGHT = 250, 
         MIN_SUBPLOT_WIDTH = 250, 
-        CAPTION_HEIGHT = 100
-        LABEL_OFFSET = 8;
+        LABEL_OFFSET = 8,
         MAX_NUM_POINTS_FOR_LABELING = 40;
 
-    function writeCaption(string, width) {
-      d3.select("#main")
-        .append("div")
-        .attr("class", "caption")
-        .attr("width", width)
-        .attr("height", CAPTION_HEIGHT)
+    function writeCaption(string, div) {
+      div.classed("caption", true)
         .append("p")
         .html("<br /><b>Caption: </b>" + string);
     }
@@ -238,11 +233,15 @@ apt = {
     }
 
 
-    function createScale(axisData, rangeStart, rangeEnd, usesPoints, rangeWidth) {
+    function createScale(axisData, rangeStart, rangeEnd, rangePoints, bars) {
 
       var s = d3.scale.linear()
-        .range([rangeStart, rangeEnd]);
-      
+        .range([rangeStart, rangeEnd]),
+          rangeWidth = 1.0;
+      if (bars && !rangePoints) {
+        rangeWidth = 0.1;
+      }
+
       // TODO: Figure out why this isn't working like it was before:
       // s.domain(d3.extent(plot.data, function(d) { return d[position]; })).nice();
       positionData = _.map(plot.data, function (d) { 
@@ -259,14 +258,15 @@ apt = {
             return axisData.ordering[d];
           });
         }
-        if (usesPoints) { 
+        if (rangePoints) { 
+        // if (subplot.markType == "point"
           // TODO: Figure out why passing in range function doesn't work.
-          var s = d3.scale.ordinal()
+          s = d3.scale.ordinal()
             .rangePoints([rangeStart, rangeEnd], rangeWidth)
             .domain(scaleDomain);
         }
         else {
-          var s = d3.scale.ordinal()
+          s = d3.scale.ordinal()
             .rangeRoundBands([rangeStart, rangeEnd], rangeWidth)
             .domain(scaleDomain);
         }
@@ -277,11 +277,12 @@ apt = {
 
     function drawVerticalAxis(marks, subplot, subplotContainer, leftmost, margin) {     
       var width = +subplotContainer.attr("width") - margin.left - margin.right,
-          height = +subplotContainer.attr("height") - margin.top - margin.bottom;
+          height = +subplotContainer.attr("height") - margin.top - margin.bottom,
+          bars = subplot.markType == "bar";
 
       if (subplot.hasVaxis) {
         var axisLabelHeight = displayedAxisLabelHeight(subplot.vaxis.label, height, subplotContainer);
-        var y = createScale(subplot.vaxis, height, 0, true, 1),
+        var y = createScale(subplot.vaxis, height, 0, true, bars),
             offset = {
               "horizontal": -1*(margin.left - axisLabelHeight),
               "vertical": (height/2)
@@ -293,7 +294,7 @@ apt = {
           wrapAndApplyAxisLabel(height - margin.top, subplotContainer, offset, "rotate(-90)", subplot.vaxis.label, false);
         }  
         
-        if (subplot.markType == "point") {
+        if (!bars) {
           marks.selectAll(subplot.markTag)
             .attr("cy", function(d) { return y(d[subplot.vaxis.pos]); });
           marks.selectAll("text")
@@ -313,13 +314,14 @@ apt = {
     function drawHorizontalAxis(marks, subplot, subplotContainer, bottommost, margin) {
       var width = +subplotContainer.attr("width") - margin.left - margin.right,
           height = +subplotContainer.attr("height") - margin.top - margin.bottom,
-          rotate = !subplot.haxis.quantitative;
+          rotate = !subplot.haxis.quantitative,
+          bars = subplot.markType == "bar";
 
       if (subplot.hasHaxis) {
 
         var axisLabelHeight = displayedAxisLabelHeight(subplot.haxis.label, width, subplotContainer);
 
-        var x = createScale(subplot.haxis, 0, width, false, .1),
+        var x = createScale(subplot.haxis, 0, width, false, bars),
             offset = {
               "horizontal": width/2,
               "vertical": height + margin.bottom - axisLabelHeight
@@ -330,7 +332,7 @@ apt = {
           wrapAndApplyAxisLabel(width, subplotContainer, offset, "", subplot.haxis.label, true);
         }
         
-        if (subplot.markType == "point") {
+        if (!bars) {
           marks.selectAll(subplot.markTag)
             .attr("cx", function(d) { return x(d[subplot.haxis.pos]); });
           marks.selectAll("text")
@@ -515,19 +517,21 @@ apt = {
     }
     
 
-    function setUpOuterContainer() {
-      var outer = d3.select("#presentation");
+    function setUpOuterContainer(outer) {
       outer.attr("width", WIDTH + LEGEND_SPACE)
         .attr("height", HEIGHT);
       return outer;
     }
 
     // Run
-    var outerContainer = setUpOuterContainer(),
+    var outerContainer = d3.select(svgPlotID),
+        captionContainer = d3.select(divCaptionID),
         margin = setUpInnerSubplots(outerContainer);   
     drawColor(outerContainer, margin);
     if (plot.caption) {
-      writeCaption(plot.caption, outerContainer.attr("width"));
+      writeCaption(plot.caption, captionContainer);
     }
+    //return outerContainer;
+
   }
 }

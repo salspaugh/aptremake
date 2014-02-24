@@ -120,6 +120,9 @@ def load(view):
     db = connect(view.database)
     cursor = db.execute(view.query, view.query_params)
     rows = cursor.fetchall()
-    data = [dict(zip(view.keys, values)) for values in rows]
+    new_rows = []
+    for row in rows:
+        new_rows.append([str(v) if v is None else v for v in row])
+    data = [dict(zip(view.keys, values)) for values in new_rows]
     db.close()
     return data

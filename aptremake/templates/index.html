@@ -72,9 +72,10 @@
 {% endblock %}
 
 {% block body_content %}
-    <svg id="presentation">
-        <script> 
-            apt.render({{ design|tojson|safe }});
-        </script>
-    </svg>
+    <svg id="presentation"></svg>
+    <div id="caption"></div>
+    <script> 
+        apt.render({{ design|tojson|safe }}, "#presentation", "#caption");
+    </script>
+    
 {% endblock %}
