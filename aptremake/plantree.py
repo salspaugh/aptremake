@@ -138,7 +138,9 @@ class CompositionTreeNode(PlanTreeNode):
 
     def generate_children(self):
         presentation = self.design.render(self.view, label_points=True)
-        if all(s["markCoding"] for s in presentation["subplots"]) and not all(s["markCoding"] == presentation["colorCoding"] for s in presentation["subplots"]):
+        has_labels = all(s["markCoding"] for s in presentation["subplots"]) 
+        labels_match_color = all(s["markCoding"] == presentation["colorCoding"] for s in presentation["subplots"]) 
+        if has_labels and not labels_match_color:
             # Added one with labels.
             p = PresentationTreeNode(presentation)
             self.add_child(p)

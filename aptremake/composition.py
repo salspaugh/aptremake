@@ -8,7 +8,8 @@ basicConfig(filename='aptremake.log', level=DEBUG)
 
 def compose(designs):
     c = composer(designs)
-    return c if c and not retinal_encodings_redundant(c) else None
+    valid = c and has_plots(c) and not retinal_encodings_redundant(c) 
+    return c if valid else None
 
 def composer(designs):
     # TODO: Verify that designs is a list of designs.
@@ -41,6 +42,9 @@ def _compose(designa, designb): # TODO: Document pre-conditions for functions
         return concat_subplots_right(designa, designb)
     if axes_compatible(designa, designb):
         return merge_compatible_axes(designa, designb)
+
+def has_plots(design):
+    return design.subplots
 
 def retinal_encodings_redundant(design):
     redundant_color = any([
