@@ -1,6 +1,5 @@
 
 import json
-from sqlite3 import connect
 
 class View(object):
 
@@ -117,7 +116,7 @@ def read_metadata(specfilename):
     return metadata
 
 def load(view):
-    db = connect(view.database)
+    db = view.database.connect()
     cursor = db.execute(view.query, view.query_params)
     rows = cursor.fetchall()
     new_rows = []
