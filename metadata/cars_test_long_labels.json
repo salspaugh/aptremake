@@ -1,6 +1,8 @@
 {
     "database": "aptremake.db",
-    "table": "cars_coded",
+    "driver": "sqlite3",
+    "path": "aptremake.db",
+    "table": "cars_test_long_labels",
     "relations": [
         {
             "name": "Car",

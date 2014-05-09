@@ -1,6 +1,8 @@
 
 import json
 
+from db import Database
+
 class View(object):
 
     def __init__(self, relations, database, query, query_params,
@@ -96,7 +98,13 @@ def read_metadata(specfilename):
     metadata = {}
     with open(specfilename) as specfile:
         spec = json.load(specfile)
-        metadata["database"] = spec["database"]
+        metadata["driver"] = spec["driver"]
+        metadata["database"] = spec.get("database", None)
+        metadata["path"] = spec.get("path", None)
+        metadata["user"] = spec.get("user", None)
+        metadata["password"] = spec.get("password", None)
+        metadata["host"] = spec.get("host", None)
+        metadata["port"] = spec.get("port", None)
         metadata["table"] = spec["table"]
         metadata["relations"] = {}
         for s in spec["relations"]:
@@ -114,6 +122,15 @@ def read_metadata(specfilename):
                 d.determinant = metadata["relations"][s["determinant"]]
                 d.dependent = metadata["relations"][s["dependent"]]
     return metadata
+
+def setup_database(metadata):
+    return Database(metadata["driver"],
+        path=metadata.get("path", None),
+        database=metadata.get("database", None),
+        user=metadata.get("user", None),
+        password=metadata.get("password", None),
+        host=metadata.get("host", None),
+        port=metadata.get("port", None))
 
 def load(view):
     db = view.database.connect()

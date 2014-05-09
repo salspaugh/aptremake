@@ -1,0 +1,20 @@
+APTREMAKEID,Car,Nation,Price,Repair,Mileage,Weight
+1,"Linc Cont",USA,11497,Good,12,4500
+2,Accord,Japan,5799,Great,25,2000
+3,"VW Dasher",Germany,7140,OK,22,1800
+4,"BMW 320i",Germany,9735,Good,25,2900
+5,"AMC Pacer",USA,4749,Terrible,17,3200
+6,"Chev Nova",USA,3955,OK,18,3200
+7,"Le Car",France,3895,OK,25,1550
+8,Civic,Japan,4499,Good,28,1600
+9,"Datsun 210",Japan,4589,Great,35,1700
+10,Subaru,Japan,3798,Good,33,1800
+11,"Saab 900",Sweden,9348,Bad,20,3000
+12,Champ,USA,4425,Good,32,1600
+13,Peugot,France,12990,OK,15,3500
+14,Horizon,USA,4482,OK,23,2200
+15,Deville,USA,11385,OK,13,4000
+16,Mustang,USA,4187,OK,20,3000
+17,"Audi 5000",Germany,9690,Bad,17,3000
+18,"Datsun 810",Japan,8128,Good,20,3000
+19,"Volvo 260",Sweden,11995,Terrible,17,3100

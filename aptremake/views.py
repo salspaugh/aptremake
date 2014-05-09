@@ -2,22 +2,24 @@
 from flask import render_template, send_from_directory, request
 from werkzeug import secure_filename
 
-from aptremake import app
+from aptremake import app, METADATA
 from apt import generate_presentation
-from metadata import read_metadata, View
+from metadata import read_metadata, View, setup_database
 from test import construct_test_query
 
 import json
 
-CARS = "/Users/salspaugh/classes/visualization/project/aptremake/specs/json/cars_coded.spec"
-
 @app.route("/", methods=["GET", "POST"])
 def design():
-    metadata = read_metadata(CARS)
-    db = metadata["database"]
+    design, buttons = process_request(request)
+    return render_template("index.html", design=design, buttons=buttons)
+    
+def process_request(request): 
+    metadata = read_metadata(METADATA)
+    db = setup_database(metadata)
     table = metadata["table"]
-    design = None
     button_data = [{"name": r.name, "selected": False, "importance": -1} for r in metadata["relations"].values()]
+    design = None
     if request.method == "POST":
         selection_data = json.loads(request.form["relations"])
         apt_input = sorted(selection_data, key=lambda x: int(x["importance"]))
@@ -39,7 +41,8 @@ def design():
             metadata["relations"][s["name"]].importance = s["importance"]
         button_data = [{"name": r.name, "selected": r.selected, "importance": r.importance} for r in metadata["relations"].values()]
     button_data.sort(key=lambda x: len(x["name"]))
-    return render_template("index.html", design=design, buttons=button_data)
+    return design, button_data
+
 
 @app.route("/data/<path:filename>")
 def data(filename):

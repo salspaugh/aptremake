@@ -1,5 +1,7 @@
 {
     "database": "aptremake.db",
+    "driver": "sqlite3",
+    "path": "aptremake.db",
     "table": "cars",
     "relations": [
         {

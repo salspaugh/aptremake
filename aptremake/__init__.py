@@ -3,12 +3,14 @@ import sqlite3
 
 from flask import Flask, g
 
-DATABASE = 'aptremake.db'
+DATABASE = "aptremake.db"
 DEBUG = True
-SECRET_KEY = 'development key'
-USERNAME = 'admin'
-PASSWORD = 'default'
-UPLOAD_FOLDER = 'uploads'
+SECRET_KEY = "development key"
+USERNAME = "admin"
+PASSWORD = "default"
+UPLOAD_FOLDER = "uploads"
+
+METADATA = "metadata/cars.json" 
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -26,3 +28,6 @@ def before_request():
 def teardown_request(exception):
     g.db.close()
 
+def set_metadata(path):
+    global METADATA
+    metadata = path
