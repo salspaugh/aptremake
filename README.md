@@ -27,4 +27,12 @@ In your browser, navigate to [127.0.0.1:5000](127.0.0.1:5000)
 * [Flask](http://flask.pocoo.org/ "Flask")
 * [SQLite](https://www.sqlite.org/ "SQLite")
 
+## Contributing
+
+I am happy to review PR's for contributions to this project, but before 
+running off to implement a change that you would like to have merged, 
+please contact me first with your idea about what you'd like to implement.
+This is a research project so many parts of the code are subject to change.
+That said, I have lots of ideas of things to work on for this project.
+So contact me if you'd like to help but aren't sure what to work on.
 
